@@ -1,4 +1,4 @@
-# indian_mss — source separation for Indian art music
+# Indian_Musicology — source separation for Indian art music
 
 A separation pipeline for Hindustani and Carnatic ensemble recordings. Off-the-shelf
 demixing models are trained on Western multitracks and fail here for two structural
