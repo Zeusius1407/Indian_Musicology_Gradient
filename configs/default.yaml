@@ -1,0 +1,61 @@
+# Single source of truth for pipeline hyperparameters.
+# Every script reads this; nothing hard-codes a number. When you report a
+# result, commit the config alongside it -- "SDR 6.2 dB" means nothing without
+# the window size that produced it.
+
+stft:
+  sample_rate: 44100      # drop to 16000 if GPU memory or disk is tight
+  n_fft: 2048             # ~46 ms window
+  hop_length: 512         # 75% overlap
+  window: hann
+
+hpss:
+  harmonic_ms: 200.0      # time-median kernel; shorten for fast tani passages
+  percussive_hz: 500.0    # frequency-median kernel; must exceed harmonic spacing
+  power: 2.0              # soft (Wiener) mask exponent
+  margin: 1.0             # >1 routes ambiguous bins to a residual stem
+
+tonic:
+  strategy: shift         # 'shift' | 'condition' | 'none'
+  canonical_hz: 146.83    # D3
+
+data:
+  sanidha_root: data/sanidha        # training: clean stems, no bleed
+  saraga_root: data/saraga          # test only: real live bleed
+  imi_root: data/imi                # classifier only
+  stems: [vocal, violin, mridangam, ghatam]
+
+augment:
+  random_gain_db: [-6.0, 6.0]
+  pitch_shift_semitones: [-2.0, 2.0]
+  shuffle_stems_across_tracks: true # build new mixes from unrelated stems
+  simulate_bleed:                   # the key augmentation for Saraga transfer
+    enabled: true
+    neighbour_gain_db: [-30.0, -12.0]
+    rir_ms: 80.0
+
+train:
+  backbone: htdemucs      # 'htdemucs' | 'unet'
+  segment_seconds: 8.0
+  batch_size: 4
+  epochs: 60
+  frozen_encoder_epochs: 10   # train the new head first, then unfreeze
+  lr: 3.0e-4
+  encoder_lr: 3.0e-5          # 10x lower once unfrozen
+  loss:
+    spectrogram_l1: 1.0
+    waveform_l1: 1.0
+  select_checkpoint_by: val_sdr   # NOT val_loss
+
+resynthesis:
+  method: mixture_phase   # 'mixture_phase' | 'griffin_lim' | 'vocoder'
+  griffin_lim_iters: 32
+
+classifier:
+  sample_rate: 22050
+  n_mfcc: 40
+  window_seconds: 1.0
+  hop_seconds: 0.5
+  epochs: 30
+  lr: 1.0e-3
+  split_by: recording     # never by window -- adjacent windows leak
