@@ -43,3 +43,28 @@ def mixture():
     """``(mix, harmonic, percussive)`` -- the three signals, sample-aligned."""
     h, p = make_tone(), make_clicks()
     return h + p, h, p
+
+
+def make_sanidha(root, n_tracks: int = 3, duration: float = 3.0, sample_rate: int = 8000):
+    """Write a tiny Sanidha-layout corpus: four stems per track, no mixdown.
+
+    Each "instrument" is distinguishable by construction -- two tones at
+    different pitches, and two click trains at different rates -- so a model
+    that learns anything at all separates them.
+    """
+    import soundfile as sf
+
+    root.mkdir(parents=True, exist_ok=True)
+    for i in range(n_tracks):
+        track = root / f"track{i:02d}"
+        track.mkdir()
+        f0 = 150.0 + 20.0 * i  # a different tonic per track
+        stems = {
+            "vocal": make_tone(duration, f0, sample_rate),
+            "violin": 0.6 * make_tone(duration, f0 * 1.5, sample_rate),
+            "mridangam": make_clicks(duration, 4.0, sample_rate),
+            "ghatam": 0.5 * make_clicks(duration, 6.0, sample_rate),
+        }
+        for name, audio in stems.items():
+            sf.write(track / f"{name}.wav", audio.astype(np.float32), sample_rate)
+    return root

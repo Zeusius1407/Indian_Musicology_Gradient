@@ -28,7 +28,7 @@ from pathlib import Path
 
 import numpy as np
 
-from .base import AUDIO_EXTENSIONS, TrackItem, load_audio
+from .base import AUDIO_EXTENSIONS, TrackItem, audio_duration, load_audio
 
 __all__ = ["Sanidha", "SANIDHA_STEMS"]
 
@@ -84,6 +84,17 @@ class Sanidha:
 
     def track_ids(self) -> list[str]:
         return list(self._tracks)
+
+    def stem_paths(self, track_id: str) -> dict[str, list[Path]]:
+        """Stem name -> the file(s) to sum for it. Used for random-crop training."""
+        return {
+            stem: (src if isinstance(src, list) else [src])
+            for stem, src in self._tracks[track_id]["stems"].items()
+        }
+
+    def duration(self, track_id: str) -> float:
+        """Shortest stem duration in seconds -- the span where all stems exist."""
+        return min(audio_duration(p) for paths in self.stem_paths(track_id).values() for p in paths)
 
     def __len__(self) -> int:
         return len(self._tracks)

@@ -6,7 +6,14 @@ The implementation lives in :mod:`indian_mss.cli.preprocess` so that the
 ``scripts/`` is not a package and is never shipped in the wheel.
 """
 
-from indian_mss.cli.preprocess import main
+import sys
+from pathlib import Path
+
+# Running ``python scripts/preprocess.py`` puts scripts/ on the path, not the repo
+# root, so make the package importable even before ``pip install -e .``.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from indian_mss.cli.preprocess import main  # noqa: E402
 
 if __name__ == "__main__":
     main()

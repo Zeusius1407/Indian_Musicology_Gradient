@@ -16,7 +16,7 @@ that measures how much cross-instrument bleed actually survived.
 | Milestone | Component | State |
 |---|---|---|
 | 1 | STFT front end, HPSS, tonic normalization, SDR metrics | **done** |
-| 2 | Demucs fine-tuning on Sanidha | scaffolded (`indian_mss/models/`) |
+| 2 | HTDemucs / U-Net fine-tuning on Sanidha, mask prediction | **done** — needs a GPU run on real data |
 | 3 | ISTFT / Griffin-Lim / vocoder resynthesis | ISTFT path done, in `dsp/hpss.py` |
 | 4 | MFCC + 2-D CNN instrument classifier | feature extraction done |
 
@@ -26,7 +26,7 @@ that measures how much cross-instrument bleed actually survived.
 python -m venv .venv && source .venv/bin/activate
 pip install compiam           # install first: most constrained dependency
 pip install -e ".[dev]"
-pytest                        # 29 tests, no data required
+pytest                        # no data required; model tests need torch
 ```
 
 `torch` is deliberately not pulled in by the base install — install the build that
@@ -67,6 +67,19 @@ Establish the HPSS baseline that Milestone 2 has to beat:
 ```bash
 python scripts/preprocess.py --evaluate --sanidha-root data/sanidha
 ```
+
+Milestone 2 — fine-tune on Sanidha (writes `best.pt`, `last.pt`, `history.json`),
+then predict mask ratios for any mix:
+
+```bash
+python scripts/train.py --outdir checkpoints/htdemucs                # --backbone unet if VRAM is short
+python scripts/separate.py --checkpoint checkpoints/htdemucs/best.pt --input concert.wav --outdir out/
+```
+
+`separate.py` writes `concert_masks.npy` — `(sources, freq, frames)` mask ratios on
+the same STFT grid as the Milestone 1 spectrograms, summing to one per bin — plus
+one `.wav` per instrument. `notebooks/train.ipynb` runs the training and charts the
+loss curves and per-stem validation SDR.
 
 Library use:
 
@@ -123,15 +136,28 @@ cancel to an unchanged SDR while sounding clearly worse.
 
 ## Remaining work
 
-**Milestone 2** — start from HTDemucs rather than Spleeter (PyTorch-native and
-still maintained; Spleeter is TF1-era). Replace the `vocals/drums/bass/other` head
-with `vocal/violin/mridangam/ghatam`, keep the pretrained encoder, and train the
-new head with the encoder frozen before unfreezing its top blocks at a 10× lower
-learning rate. The augmentation that matters most is **simulated bleed**: convolve
-each clean Sanidha stem with a short room impulse response and mix attenuated
-copies of its neighbours into every channel. That is what carries the model from
-studio-clean training data to Saraga's live conditions. Select checkpoints by
-validation SDR, not validation loss.
+**Milestone 2** — implemented; what remains is the real training run and the
+Saraga number. How it is built:
+
+* *Backbone.* HTDemucs rather than Spleeter (PyTorch-native and maintained;
+  Spleeter is TF1-era). Its `drums/bass/other/vocals` output head is rebuilt for
+  `vocal/violin/mridangam/ghatam`, each new source starting from the closest
+  Western one (`vocal←vocals`, `violin←other`, `mridangam`/`ghatam←drums`), so
+  training starts from a model that already splits voice, melody and percussion.
+* *Parameter-efficient schedule.* Phase 1 (`frozen_encoder_epochs`) trains only
+  that head; phase 2 unfreezes the decoders and transformer at a 10× lower rate.
+  Both encoders stay frozen throughout.
+* *Simulated bleed.* Each source is convolved with a random short room response
+  and leaked into the other microphones at −30 to −12 dB, and every leaked copy is
+  labelled as the instrument that made it. That teaches the masks to follow the
+  instrument, not the microphone — the bridge from studio Sanidha to live Saraga.
+* *Other augmentation.* Per-stem gain, one shared pitch shift (the ensemble stays
+  in tune with itself), and stems shuffled across tracks.
+* *Selection.* `best.pt` is chosen by mean validation SDR, never loss, with SDR
+  logged per stem. Validation tracks are held out whole, never as segments.
+* *Tonic.* Training does not pitch-normalize whole tracks; the ±2 semitone shift
+  augmentation covers tonic variation instead, and separation runs on raw audio.
+* *Still to do:* `data/saraga.py`, then evaluate `best.pt` on Saraga.
 
 **Milestone 3** — the mixture-phase ISTFT path already works and is the correct
 baseline. Compare it against Griffin-Lim and a HiFi-GAN vocoder both numerically
@@ -150,10 +176,13 @@ much bleed is left.
 indian_mss/
   data/     base.py sanidha.py                    — loaders (saraga.py, imi.py to build)
   dsp/      stft.py hpss.py tonic.py features.py  — Milestone 1
-  models/                                          — Milestone 2 (to build)
+  models/   separator.py demucs_backbone.py unet.py spec.py — Milestone 2 models
+  train/    augment.py dataset.py losses.py loop.py report.py — Milestone 2 training
   infer/                                           — Milestone 3 CLI (to build)
   eval/     sdr.py                                 — SDR / SIR / SAR / SI-SDR
 configs/default.yaml                               — all hyperparameters
 scripts/preprocess.py                              — Milestone 1 CLI
-tests/test_dsp.py                                  — runs without any dataset
+scripts/train.py  scripts/separate.py              — Milestone 2 CLIs
+notebooks/train.ipynb                              — training run + charts
+tests/                                             — run without any dataset
 ```

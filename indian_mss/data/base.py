@@ -12,7 +12,7 @@ from pathlib import Path
 
 import numpy as np
 
-__all__ = ["TrackItem", "load_audio", "AUDIO_EXTENSIONS"]
+__all__ = ["TrackItem", "load_audio", "load_segment", "audio_duration", "AUDIO_EXTENSIONS"]
 
 AUDIO_EXTENSIONS = (".wav", ".flac", ".mp3", ".ogg", ".aiff", ".aif")
 
@@ -46,3 +46,35 @@ def load_audio(path: str | Path, sample_rate: int) -> np.ndarray:
         raise FileNotFoundError(f"audio file not found: {path}")
     audio, _ = librosa.load(path, sr=sample_rate, mono=True)
     return audio.astype(np.float32)
+
+
+def audio_duration(path: str | Path) -> float:
+    """Duration in seconds, read from the header only."""
+    import soundfile as sf
+
+    return float(sf.info(str(path)).duration)
+
+
+def load_segment(path: str | Path, sample_rate: int, start_seconds: float, seconds: float) -> np.ndarray:
+    """Load ``seconds`` of mono audio from ``start_seconds``, at ``sample_rate``.
+
+    Reads only the requested frames from disk, so random training crops do not
+    decode whole concert-length files. The result is always exactly
+    ``round(seconds * sample_rate)`` samples (zero-padded past the end of the
+    file), which keeps stems from different files sample-aligned.
+    """
+    import soundfile as sf
+
+    n_out = int(round(seconds * sample_rate))
+    with sf.SoundFile(str(path)) as f:
+        native = f.samplerate
+        f.seek(min(int(round(start_seconds * native)), f.frames))
+        audio = f.read(int(round(seconds * native)), dtype="float32", always_2d=True)
+    audio = audio.mean(axis=1)
+    if native != sample_rate:
+        import librosa
+
+        audio = librosa.resample(audio, orig_sr=native, target_sr=sample_rate)
+    if len(audio) < n_out:
+        audio = np.pad(audio, (0, n_out - len(audio)))
+    return audio[:n_out].astype(np.float32)
