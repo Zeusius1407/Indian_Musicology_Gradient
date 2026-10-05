@@ -7,6 +7,16 @@ Separate one file and write both spectrogram arrays plus audio previews::
 
     python scripts/preprocess.py --input concert.wav --outdir out/ --write-audio
 
+Each array is written twice: ``*_melodic.npy`` is the linear magnitude (what
+masking and resynthesis need) and ``*_melodic_log.npy`` is the log-compressed
+spectrogram in [0, 1] (what a network or a plot wants). All log arrays share
+the mixture's peak as reference, so their levels are comparable.
+
+Hyperparameters come from ``configs/default.yaml``; any flag given on the
+command line overrides the file::
+
+    python scripts/preprocess.py --input concert.wav --harmonic-ms 120 --tonic-strategy none
+
 Score the HPSS baseline against Sanidha ground truth (harmonic stems vs
 percussive stems), which is the number the neural model must beat in
 Milestone 2::
@@ -22,24 +32,64 @@ from pathlib import Path
 
 import numpy as np
 
+from indian_mss.config import DEFAULT_CONFIG_PATH, load_config
 from indian_mss.dsp.hpss import HPSSConfig, hpss_spectrograms
-from indian_mss.dsp.stft import STFTConfig, istft
+from indian_mss.dsp.stft import STFTConfig, istft, log_magnitude
 from indian_mss.eval.sdr import evaluate_stems
 
 # Which Sanidha stems count as melodic vs percussive when scoring HPSS.
 HARMONIC_STEMS = ("vocal", "violin")
 PERCUSSIVE_STEMS = ("mridangam", "ghatam")
 
+TONIC_STRATEGIES = ("shift", "condition", "none")
+
+# (argparse attribute, config section, config key, fallback if neither is set).
+# Command-line flags win over the config file, which wins over the fallback.
+CONFIG_KEYS = (
+    ("sample_rate", "stft", "sample_rate", 44100),
+    ("n_fft", "stft", "n_fft", 2048),
+    ("hop_length", "stft", "hop_length", 512),
+    ("window", "stft", "window", "hann"),
+    ("harmonic_ms", "hpss", "harmonic_ms", 200.0),
+    ("percussive_hz", "hpss", "percussive_hz", 500.0),
+    ("power", "hpss", "power", 2.0),
+    ("margin", "hpss", "margin", 1.0),
+    ("tonic_strategy", "tonic", "strategy", "none"),
+    ("canonical_hz", "tonic", "canonical_hz", 146.83),
+    ("sanidha_root", "data", "sanidha_root", "data/sanidha"),
+)
+
+
+def resolve_args(args: argparse.Namespace, p: argparse.ArgumentParser) -> None:
+    """Fill every unset flag from the config file, then from the fallback."""
+    if args.config is not None:
+        cfg = load_config(args.config)
+    elif DEFAULT_CONFIG_PATH.is_file():
+        cfg = load_config(DEFAULT_CONFIG_PATH)
+    else:
+        cfg = {}
+        print(f"note: {DEFAULT_CONFIG_PATH} not found, using built-in defaults")
+
+    for attr, section, key, fallback in CONFIG_KEYS:
+        if getattr(args, attr) is None:
+            setattr(args, attr, (cfg.get(section) or {}).get(key, fallback))
+
+    if args.tonic_strategy not in TONIC_STRATEGIES:
+        p.error(f"tonic strategy must be one of {TONIC_STRATEGIES}, got {args.tonic_strategy!r}")
+
 
 def build_configs(args: argparse.Namespace) -> tuple[STFTConfig, HPSSConfig]:
     stft_cfg = STFTConfig(
-        sample_rate=args.sample_rate, n_fft=args.n_fft, hop_length=args.hop_length
+        sample_rate=int(args.sample_rate),
+        n_fft=int(args.n_fft),
+        hop_length=int(args.hop_length),
+        window=str(args.window),
     )
     hpss_cfg = HPSSConfig(
-        harmonic_ms=args.harmonic_ms,
-        percussive_hz=args.percussive_hz,
-        power=args.power,
-        margin=args.margin,
+        harmonic_ms=float(args.harmonic_ms),
+        percussive_hz=float(args.percussive_hz),
+        power=float(args.power),
+        margin=float(args.margin),
     )
     return stft_cfg, hpss_cfg
 
@@ -50,22 +100,41 @@ def run_single(args: argparse.Namespace) -> None:
     stft_cfg, hpss_cfg = build_configs(args)
     audio = load_audio(args.input, stft_cfg.sample_rate)
 
-    if args.normalize_tuning:
-        from indian_mss.dsp.tonic import normalize_tuning
-
-        audio, tonic = normalize_tuning(audio, stft_cfg.sample_rate)
-        print(f"estimated tonic: {tonic:.2f} Hz (normalized)")
-
-    result = hpss_spectrograms(audio, stft_cfg, hpss_cfg)
-
     outdir = Path(args.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
     stem = Path(args.input).stem
 
-    np.save(outdir / f"{stem}_melodic.npy", result.harmonic.astype(np.float32))
-    np.save(outdir / f"{stem}_percussive.npy", result.percussive.astype(np.float32))
-    np.save(outdir / f"{stem}_residual.npy", result.residual.astype(np.float32))
-    print(f"wrote spectrogram arrays of shape {result.harmonic.shape} to {outdir}")
+    tonic_record = None
+    if args.tonic_strategy == "shift":
+        from indian_mss.dsp.tonic import normalize_tuning
+
+        target = float(args.canonical_hz)
+        audio, tonic = normalize_tuning(audio, stft_cfg.sample_rate, target_hz=target)
+        tonic_record = {"strategy": "shift", "tonic_hz": tonic, "target_hz": target}
+        print(f"estimated tonic: {tonic:.2f} Hz (shifted to {target:.2f} Hz)")
+    elif args.tonic_strategy == "condition":
+        from indian_mss.dsp.tonic import estimate_tonic
+
+        tonic = estimate_tonic(audio, stft_cfg.sample_rate)
+        tonic_record = {"strategy": "condition", "tonic_hz": tonic}
+        print(f"estimated tonic: {tonic:.2f} Hz (recorded, audio unchanged)")
+    if tonic_record is not None:
+        # The source tonic is needed to undo a shift before delivering audio,
+        # and is the conditioning input under the 'condition' strategy.
+        (outdir / f"{stem}_tonic.json").write_text(json.dumps(tonic_record, indent=2))
+
+    result = hpss_spectrograms(audio, stft_cfg, hpss_cfg)
+
+    # One reference for all three log arrays: the loudest bin of the mixture.
+    mix_peak = float((result.harmonic + result.percussive + result.residual).max())
+    for name, mag in (
+        ("melodic", result.harmonic),
+        ("percussive", result.percussive),
+        ("residual", result.residual),
+    ):
+        np.save(outdir / f"{stem}_{name}.npy", mag.astype(np.float32))
+        np.save(outdir / f"{stem}_{name}_log.npy", log_magnitude(mag, ref=mix_peak).astype(np.float32))
+    print(f"wrote linear and log spectrogram arrays of shape {result.harmonic.shape} to {outdir}")
 
     if args.write_audio:
         import soundfile as sf
@@ -87,6 +156,8 @@ def run_evaluate(args: argparse.Namespace) -> None:
 
     stft_cfg, hpss_cfg = build_configs(args)
     dataset = Sanidha(args.sanidha_root, stft_cfg.sample_rate)
+    # Tonic shifting is deliberately not applied here: it would move the
+    # mixture away from the unshifted reference stems and wreck the SDR.
 
     rows = []
     track_ids = dataset.track_ids()[: args.limit] if args.limit else dataset.track_ids()
@@ -162,6 +233,7 @@ def run_evaluate(args: argparse.Namespace) -> None:
                         "hop_length": stft_cfg.hop_length,
                         "window": stft_cfg.window,
                     },
+                    "config_file": str(args.config or DEFAULT_CONFIG_PATH),
                     "hpss": {
                         "harmonic_ms": hpss_cfg.harmonic_ms,
                         "percussive_hz": hpss_cfg.percussive_hz,
@@ -187,25 +259,40 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--input", type=str, help="polyphonic audio file to process")
     p.add_argument("--outdir", type=str, default="out")
     p.add_argument("--write-audio", action="store_true", help="also resynthesize .wav previews")
-    p.add_argument("--normalize-tuning", action="store_true", help="pitch-shift to the canonical tonic")
+    p.add_argument(
+        "--config", type=str, default=None, help=f"YAML config (default: {DEFAULT_CONFIG_PATH} if present)"
+    )
+    p.add_argument("--tonic-strategy", choices=TONIC_STRATEGIES, default=None)
+    p.add_argument(
+        "--normalize-tuning",
+        dest="tonic_strategy",
+        action="store_const",
+        const="shift",
+        help="alias for --tonic-strategy shift",
+    )
+    p.add_argument("--canonical-hz", type=float, default=None, help="tonic to shift to")
 
     p.add_argument("--evaluate", action="store_true", help="score HPSS against Sanidha ground truth")
-    p.add_argument("--sanidha-root", type=str, default="data/sanidha")
+    p.add_argument("--sanidha-root", type=str, default=None)
     p.add_argument("--limit", type=int, default=0, help="score only the first N tracks")
 
-    p.add_argument("--sample-rate", type=int, default=44100)
-    p.add_argument("--n-fft", type=int, default=2048)
-    p.add_argument("--hop-length", type=int, default=512)
-    p.add_argument("--harmonic-ms", type=float, default=200.0)
-    p.add_argument("--percussive-hz", type=float, default=500.0)
-    p.add_argument("--power", type=float, default=2.0)
-    p.add_argument("--margin", type=float, default=1.0)
+    # Defaults are None so that "not given" can be told apart from "given the
+    # same value as the config" -- unset flags are filled by resolve_args.
+    p.add_argument("--sample-rate", type=int, default=None)
+    p.add_argument("--n-fft", type=int, default=None)
+    p.add_argument("--hop-length", type=int, default=None)
+    p.add_argument("--window", type=str, default=None)
+    p.add_argument("--harmonic-ms", type=float, default=None)
+    p.add_argument("--percussive-hz", type=float, default=None)
+    p.add_argument("--power", type=float, default=None)
+    p.add_argument("--margin", type=float, default=None)
     return p
 
 
 def main(argv: list[str] | None = None) -> None:
     p = build_parser()
     args = p.parse_args(argv)
+    resolve_args(args, p)
 
     if args.evaluate:
         run_evaluate(args)

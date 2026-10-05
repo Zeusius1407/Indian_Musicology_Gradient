@@ -26,7 +26,7 @@ that measures how much cross-instrument bleed actually survived.
 python -m venv .venv && source .venv/bin/activate
 pip install compiam           # install first: most constrained dependency
 pip install -e ".[dev]"
-pytest                        # 25 tests, no data required
+pytest                        # 29 tests, no data required
 ```
 
 `torch` is deliberately not pulled in by the base install — install the build that
@@ -53,6 +53,14 @@ spectrogram arrays:
 ```bash
 python scripts/preprocess.py --input concert.wav --outdir out/ --write-audio
 ```
+
+This writes `concert_melodic.npy` / `concert_percussive.npy` (linear magnitude,
+used for masking and resynthesis) and `*_log.npy` versions (log-spectrogram in
+[0, 1], all scaled against the mixture's peak so stem levels stay comparable).
+Settings come from `configs/default.yaml` — including `tonic.strategy: shift`,
+which pitch-shifts to the canonical Sa and records the source tonic in
+`concert_tonic.json`. Any flag (`--n-fft`, `--harmonic-ms`,
+`--tonic-strategy none`, `--config other.yaml`, …) overrides the file.
 
 Establish the HPSS baseline that Milestone 2 has to beat:
 

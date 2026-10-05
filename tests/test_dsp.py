@@ -39,6 +39,14 @@ def test_log_magnitude_bounded():
     assert lm.min() >= 0.0 and lm.max() <= 1.0 + 1e-9
 
 
+def test_log_magnitude_shared_reference():
+    """With a common ``ref``, a quieter stem stays below 1 instead of being rescaled."""
+    mag, _ = magphase(stft(make_tone(0.5), CFG))
+    loud, quiet = log_magnitude(mag, ref=mag.max()), log_magnitude(0.1 * mag, ref=mag.max())
+    assert loud.max() == pytest.approx(1.0)
+    assert quiet.max() == pytest.approx(1.0 - 20.0 / 80.0)
+
+
 def test_kernel_sizes_are_odd_and_positive():
     frames, bins = HPSSConfig().kernel_sizes(CFG)
     assert frames % 2 == 1 and bins % 2 == 1
