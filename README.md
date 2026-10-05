@@ -26,7 +26,7 @@ that measures how much cross-instrument bleed actually survived.
 python -m venv .venv && source .venv/bin/activate
 pip install compiam           # install first: most constrained dependency
 pip install -e ".[dev]"
-pytest                        # 11 tests, no data required
+pytest                        # 25 tests, no data required
 ```
 
 `torch` is deliberately not pulled in by the base install — install the build that
@@ -140,7 +140,7 @@ much bleed is left.
 
 ```
 indian_mss/
-  data/     base.py sanidha.py saraga.py imi.py   — one interface, three corpora
+  data/     base.py sanidha.py                    — loaders (saraga.py, imi.py to build)
   dsp/      stft.py hpss.py tonic.py features.py  — Milestone 1
   models/                                          — Milestone 2 (to build)
   infer/                                           — Milestone 3 CLI (to build)

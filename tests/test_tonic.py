@@ -26,7 +26,7 @@ def cents(a: float, b: float) -> float:
     return abs(1200.0 * np.log2(a / b))
 
 
-@pytest.mark.parametrize("freq", [146.83, 176.2, 220.0])
+@pytest.mark.parametrize("freq", [146.83, 176.2, 220.0, 261.6])
 def test_estimate_tonic_recovers_a_drone(freq):
     """A sustained drone's fundamental is the tonic, within a few cents.
 

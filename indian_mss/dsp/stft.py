@@ -123,13 +123,22 @@ def magphase(spec: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     return mag, phase
 
 
-def log_magnitude(mag: np.ndarray, eps: float = 1e-8, ref_db: float = 80.0) -> np.ndarray:
+def log_magnitude(
+    mag: np.ndarray, eps: float = 1e-8, ref_db: float = 80.0, ref: float | None = None
+) -> np.ndarray:
     """Log-compressed magnitude in [0, 1], the usual network input.
 
     ``ref_db`` sets the dynamic range floor: anything more than ``ref_db``
     below the loudest bin maps to 0. Without a floor the near-silent bins
     dominate the loss and the model wastes capacity modelling noise.
+
+    ``ref`` is the magnitude that maps to 1; it defaults to ``mag.max()``.
+    Pass the *mixture's* peak when compressing several stems of one mix, so
+    they share a scale -- otherwise a quiet percussive stem is stretched to
+    the same [0, 1] range as a loud melodic one and their levels stop being
+    comparable.
     """
     db = 20.0 * np.log10(np.maximum(mag, eps))
-    db = np.maximum(db, db.max() - ref_db)
-    return (db - (db.max() - ref_db)) / ref_db
+    top = 20.0 * np.log10(max(ref, eps)) if ref is not None else db.max()
+    db = np.clip(db, top - ref_db, top)
+    return (db - (top - ref_db)) / ref_db

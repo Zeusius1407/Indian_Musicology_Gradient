@@ -14,10 +14,11 @@ dependencies = [
     "librosa>=0.10",
     "soundfile>=0.12",
     "matplotlib>=3.7",
+    "pyyaml>=6.0",
 ]
 
 [project.optional-dependencies]
-train = ["torch>=2.1", "torchaudio>=2.1", "demucs>=4.0", "pyyaml>=6.0", "tqdm>=4.66"]
+train = ["torch>=2.1", "torchaudio>=2.1", "demucs>=4.0", "tqdm>=4.66"]
 eval = ["museval>=0.4"]
 iam = ["compiam>=0.4"]
 dev = ["pytest>=7.4"]

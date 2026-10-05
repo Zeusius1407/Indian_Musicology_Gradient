@@ -26,11 +26,17 @@ from __future__ import annotations
 
 import numpy as np
 
-__all__ = ["estimate_tonic", "normalize_tuning", "CANONICAL_TONIC_HZ"]
+__all__ = ["estimate_tonic", "normalize_tuning", "CANONICAL_TONIC_HZ", "TUNING_TOLERANCE_CENTS"]
 
 #: Canonical tonic to normalize to. 146.83 Hz is D3, a common male vocal Sa;
 #: the exact value is arbitrary but must be fixed across the whole dataset.
 CANONICAL_TONIC_HZ = 146.83
+
+#: Shifts smaller than this are skipped. Matches the resolution of
+#: ``estimate_tonic`` (10-cent histogram bins plus pYIN jitter): a tighter
+#: threshold would resample audio that is already at the target, purely
+#: because of estimation noise, and degrade it for nothing.
+TUNING_TOLERANCE_CENTS = 20.0
 
 
 def estimate_tonic(audio: np.ndarray, sample_rate: int, fmin: float = 100.0, fmax: float = 400.0) -> float:
@@ -69,8 +75,17 @@ def estimate_tonic(audio: np.ndarray, sample_rate: int, fmin: float = 100.0, fma
     hist, edges = np.histogram(folded, bins=120, range=(0.0, 1200.0))  # 10-cent bins
     peak = 0.5 * (edges[hist.argmax()] + edges[hist.argmax() + 1])
 
-    # Map the winning pitch class back to the octave where most energy sits.
-    candidate = fmin * 2 ** (peak / 1200.0)
+    # Map the winning pitch class back to the octave the pitch track actually
+    # occupies. Folding threw the octave away, so recover it from the frames
+    # that voted for the winning bin: without this every tonic above 2*fmin
+    # (most female vocal Sa) comes back an octave low.
+    offset = np.mod(folded - peak + 600.0, 1200.0) - 600.0  # circular distance to peak
+    near = np.abs(offset) <= 10.0
+    octaves = np.round((cents[near] - peak) / 1200.0).astype(int)
+    values, counts = np.unique(octaves, return_counts=True)
+    octave = int(values[counts.argmax()])
+
+    candidate = fmin * 2 ** (octave + peak / 1200.0)
     while candidate < fmin:
         candidate *= 2
     while candidate > fmax:
@@ -96,7 +111,7 @@ def normalize_tuning(
         tonic_hz = estimate_tonic(audio, sample_rate)
 
     n_steps = 12.0 * np.log2(target_hz / tonic_hz)
-    if abs(n_steps) < 0.01:
+    if abs(n_steps) * 100.0 < TUNING_TOLERANCE_CENTS:
         return audio, tonic_hz
 
     shifted = librosa.effects.pitch_shift(
