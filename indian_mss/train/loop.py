@@ -27,7 +27,7 @@ from ..data.sanidha import Sanidha
 from ..dsp.stft import STFTConfig
 from ..eval.sdr import evaluate_stems
 from ..models.separator import build_separator, param_groups, save_checkpoint, separate
-from .dataset import SegmentDataset, split_tracks, track_refs
+from .dataset import SegmentDataset, concert_of, split_tracks, track_refs
 from .losses import SeparationLoss
 
 __all__ = ["pick_device", "train", "validate"]
@@ -141,9 +141,18 @@ def train(
 
     # --- data --------------------------------------------------------------
     corpus = Sanidha(sanidha_root, sr, stems=tuple(sources))
-    train_ids, val_ids = split_tracks(corpus, float(tcfg.get("val_fraction", 0.15)), seed)
+    train_ids, val_ids = split_tracks(
+        corpus, float(tcfg.get("val_fraction", 0.15)), seed, tcfg.get("val_concerts")
+    )
     if not val_ids:
-        raise ValueError("need at least two Sanidha tracks: one to train on, one to validate on")
+        raise ValueError("need at least two Sanidha concerts: one to train on, one to validate on")
+    held = sorted({concert_of(t) for t in val_ids})
+    print(f"validation: {', '.join(held)} held out ({len(val_ids)} tracks; {len(train_ids)} train)")
+    # A stem no held-out concert plays is never scored, so it cannot steer
+    # checkpoint selection -- say so rather than let it pass silently.
+    unvalidated = [s for s in sources if not any(corpus.stem_paths(t).get(s) for t in val_ids)]
+    if unvalidated:
+        print(f"warning: no validation track has {', '.join(unvalidated)}; best.pt ignores those stems")
     segment = float(tcfg.get("segment_seconds", 7.8))
     train_set = SegmentDataset(
         track_refs(corpus, train_ids),

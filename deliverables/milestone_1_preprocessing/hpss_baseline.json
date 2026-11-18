@@ -1,0 +1,825 @@
+{
+  "config": {
+    "stft": {
+      "sample_rate": 44100,
+      "n_fft": 2048,
+      "hop_length": 512,
+      "window": "hann"
+    },
+    "config_file": "configs/default.yaml",
+    "seconds": 60.0,
+    "hpss": {
+      "harmonic_ms": 200.0,
+      "percussive_hz": 500.0,
+      "power": 2.0,
+      "margin": 1.0
+    }
+  },
+  "n_tracks": 37,
+  "n_synthetic_mixtures": 37,
+  "per_track": [
+    {
+      "track_id": "Concert01_01-Vanajakshi-Varnam",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "ghatam",
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 6.577576261759605,
+        "sir": 9.807459344612155,
+        "sar": 9.810650695947448,
+        "si_sdr": 6.57784961259148
+      },
+      "percussive": {
+        "sdr": 0.09782386261686535,
+        "sir": 9.479113064352955,
+        "sar": 1.0938658377249584,
+        "si_sdr": 0.0979484289700021
+      }
+    },
+    {
+      "track_id": "Concert01_02-Naada-Sudha",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "ghatam",
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 8.197868644288475,
+        "sir": 12.29622746804355,
+        "sar": 10.58751807185477,
+        "si_sdr": 8.198059466311205
+      },
+      "percussive": {
+        "sdr": -0.7194894467075542,
+        "sir": 7.821830306744952,
+        "sar": 0.5988339897351739,
+        "si_sdr": -0.7191978824082496
+      }
+    },
+    {
+      "track_id": "Concert01_03-Emi-Jesithe",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "ghatam",
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 14.13055369332299,
+        "sir": 20.23111770503508,
+        "sar": 15.394594925319483,
+        "si_sdr": 14.131539785471576
+      },
+      "percussive": {
+        "sdr": -29.363984520355647,
+        "sir": -19.508253307155748,
+        "sar": -9.33346075094464,
+        "si_sdr": -29.418006761413118
+      }
+    },
+    {
+      "track_id": "Concert01_04-Yevaruvu-Ninnuvina",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "ghatam",
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 6.599500665140842,
+        "sir": 9.241664309374539,
+        "sar": 10.500662881486393,
+        "si_sdr": 6.599910454468853
+      },
+      "percussive": {
+        "sdr": 1.4405961416667084,
+        "sir": 12.940610730246572,
+        "sar": 1.9747146854110555,
+        "si_sdr": 1.441170523271699
+      }
+    },
+    {
+      "track_id": "Concert01_05-Mariveredi",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "ghatam",
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 7.518573233501643,
+        "sir": 9.672035196748983,
+        "sar": 12.042160975352857,
+        "si_sdr": 7.518592113694601
+      },
+      "percussive": {
+        "sdr": -2.9918097992264956,
+        "sir": 7.854925746298839,
+        "sar": -1.9598269634443513,
+        "si_sdr": -2.9918317938483336
+      }
+    },
+    {
+      "track_id": "Concert01_06-Raama-Nee-Samanamevaru",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "ghatam",
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 6.151402690000384,
+        "sir": 9.474912279132951,
+        "sar": 9.333943518699261,
+        "si_sdr": 6.1516710799158165
+      },
+      "percussive": {
+        "sdr": 0.6779822653161643,
+        "sir": 9.786557150260554,
+        "sar": 1.680687924334758,
+        "si_sdr": 0.6782059600929958
+      }
+    },
+    {
+      "track_id": "Concert01_07-Ada-Modi-Galade",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 1.6558022797578034,
+        "sir": 3.457379486772172,
+        "sar": 7.963750268333389,
+        "si_sdr": 1.6561888944047953
+      },
+      "percussive": {
+        "sdr": -0.12687460325080643,
+        "sir": 11.598415638240196,
+        "sar": 0.4659366786649336,
+        "si_sdr": -0.12668965688654976
+      }
+    },
+    {
+      "track_id": "Concert02_01-Shree-Venkate-Girisham",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 5.102900935638893,
+        "sir": 8.539603317120587,
+        "sar": 8.293886280105204,
+        "si_sdr": 5.103409700973083
+      },
+      "percussive": {
+        "sdr": -0.3781653324063172,
+        "sir": 6.482513561211242,
+        "sar": 1.5043623142834015,
+        "si_sdr": -0.3780275849205348
+      }
+    },
+    {
+      "track_id": "Concert02_02-Venkataramana",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 7.440028383438715,
+        "sir": 11.006635415339304,
+        "sar": 10.288725741950469,
+        "si_sdr": 7.440026367382089
+      },
+      "percussive": {
+        "sdr": -0.39410761053519106,
+        "sir": 7.182805857215005,
+        "sar": 1.2000258295316866,
+        "si_sdr": -0.39350532211235684
+      }
+    },
+    {
+      "track_id": "Concert02_03-Cittam-Irangadadenaiyya",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 9.37649895783993,
+        "sir": 13.534939452793529,
+        "sar": 11.667895771164163,
+        "si_sdr": 9.376586935539068
+      },
+      "percussive": {
+        "sdr": -2.8297044742184263,
+        "sir": 5.612221127796445,
+        "sar": -1.1048198024658251,
+        "si_sdr": -2.829244446474068
+      }
+    },
+    {
+      "track_id": "Concert02_04-Nadopasana",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 8.38361006609302,
+        "sir": 12.588906659027629,
+        "sar": 10.690688491403037,
+        "si_sdr": 8.384101087163398
+      },
+      "percussive": {
+        "sdr": -0.6257071374912329,
+        "sir": 7.37539108599084,
+        "sar": 0.8533523382989172,
+        "si_sdr": -0.6249989863335084
+      }
+    },
+    {
+      "track_id": "Concert02_05-Unnai-Noki-Naan",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 10.44791885997932,
+        "sir": 13.733887930800964,
+        "sar": 13.379045651108425,
+        "si_sdr": 10.448693514529522
+      },
+      "percussive": {
+        "sdr": 0.05528471554818869,
+        "sir": 10.865181394597716,
+        "sar": 0.7735511270843018,
+        "si_sdr": 0.05573086578023417
+      }
+    },
+    {
+      "track_id": "Concert03_01-Vanajakshi-Varnam",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "ghatam",
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 6.795159466406532,
+        "sir": 10.742773702764005,
+        "sar": 9.386380510142274,
+        "si_sdr": 6.7953969907908
+      },
+      "percussive": {
+        "sdr": 2.647341737419859,
+        "sir": 11.226131095088858,
+        "sar": 3.611580316985684,
+        "si_sdr": 2.6474838797279276
+      }
+    },
+    {
+      "track_id": "Concert03_02-Sharanam-Bhavan",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "ghatam",
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 4.248547160470408,
+        "sir": 6.8548375374557065,
+        "sar": 8.518913969778012,
+        "si_sdr": 4.248857110840822
+      },
+      "percussive": {
+        "sdr": 1.9490241527693362,
+        "sir": 10.930473434159612,
+        "sar": 2.8731647850986097,
+        "si_sdr": 1.9490897108055019
+      }
+    },
+    {
+      "track_id": "Concert03_03-Shambo-Sathatham",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "ghatam",
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 8.953978876127781,
+        "sir": 11.85879991242552,
+        "sar": 12.346616961457546,
+        "si_sdr": 8.954384495173139
+      },
+      "percussive": {
+        "sdr": 1.8394907436234482,
+        "sir": 11.891429237750726,
+        "sar": 2.563576718599893,
+        "si_sdr": 1.8393541807571647
+      }
+    },
+    {
+      "track_id": "Concert03_04-Baaraiya-Ranga",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "ghatam",
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 7.11243035860403,
+        "sir": 10.814128644342578,
+        "sar": 9.87234388882147,
+        "si_sdr": 7.112666049727538
+      },
+      "percussive": {
+        "sdr": 2.5930804639420795,
+        "sir": 10.907446325188687,
+        "sar": 3.6245758136451616,
+        "si_sdr": 2.593203645625687
+      }
+    },
+    {
+      "track_id": "Concert03_05-Ramanatham-Bhajeham",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "ghatam",
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 9.328883750099944,
+        "sir": 12.150964912534564,
+        "sar": 12.792839555296098,
+        "si_sdr": 9.329240615099739
+      },
+      "percussive": {
+        "sdr": 2.3907311571086254,
+        "sir": 18.788281779820096,
+        "sar": 2.5484667909204353,
+        "si_sdr": 2.390762532520524
+      }
+    },
+    {
+      "track_id": "Concert03_06-Venkatachala-Nilayam",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "ghatam",
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 9.222179615909939,
+        "sir": 12.571797315022401,
+        "sar": 12.15157176813912,
+        "si_sdr": 9.222385485227724
+      },
+      "percussive": {
+        "sdr": 2.8678975762545815,
+        "sir": 13.705455720597046,
+        "sar": 3.4228438050323073,
+        "si_sdr": 2.8681505380334964
+      }
+    },
+    {
+      "track_id": "Concert04_01-Veeriboni-Varnam",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 5.367260994525108,
+        "sir": 7.893486553565263,
+        "sar": 9.576086830175624,
+        "si_sdr": 5.367580537634341
+      },
+      "percussive": {
+        "sdr": 2.3057284202397517,
+        "sir": 13.743334991236898,
+        "sar": 2.8090557744958304,
+        "si_sdr": 2.3058431022457446
+      }
+    },
+    {
+      "track_id": "Concert04_01-Veeriboni-Varnam-(Take-1)",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 6.226401645399981,
+        "sir": 8.508838854479613,
+        "sar": 10.684338015030498,
+        "si_sdr": 6.226728860194179
+      },
+      "percussive": {
+        "sdr": 1.1279081928060468,
+        "sir": 12.23686307557877,
+        "sar": 1.730099422440107,
+        "si_sdr": 1.127933018866863
+      }
+    },
+    {
+      "track_id": "Concert04_02-Mahaganapathe",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 6.034094355916385,
+        "sir": 9.032491158813365,
+        "sar": 9.567678623559248,
+        "si_sdr": 6.034309692156748
+      },
+      "percussive": {
+        "sdr": 3.623762157516452,
+        "sir": 17.047420835397723,
+        "sar": 3.9107003537747276,
+        "si_sdr": 3.6238942668915683
+      }
+    },
+    {
+      "track_id": "Concert04_03-Nannu-Brova",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 6.3744842534556945,
+        "sir": 9.318042728935131,
+        "sar": 9.933109454736062,
+        "si_sdr": 6.374738256801754
+      },
+      "percussive": {
+        "sdr": -0.6276563013635541,
+        "sir": 7.897864690341748,
+        "sar": 0.6825473954883947,
+        "si_sdr": -0.627561113672201
+      }
+    },
+    {
+      "track_id": "Concert04_04-Durithagaja-Panchanana",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 8.744715193954002,
+        "sir": 11.224768959968909,
+        "sar": 12.674930366736206,
+        "si_sdr": 8.744947392713993
+      },
+      "percussive": {
+        "sdr": 1.9526171263619658,
+        "sir": 16.75169291761717,
+        "sar": 2.189688197094932,
+        "si_sdr": 1.9530477383716085
+      }
+    },
+    {
+      "track_id": "Concert04_05-Kamalaptakula",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 7.191812301097511,
+        "sir": 9.962135639903913,
+        "sar": 10.873511499410796,
+        "si_sdr": 7.19209020490635
+      },
+      "percussive": {
+        "sdr": 0.9341548997146667,
+        "sir": 12.13640852077376,
+        "sar": 1.5343280240974269,
+        "si_sdr": 0.9344062457679512
+      }
+    },
+    {
+      "track_id": "Concert04_06-Balagopala",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 5.1725492968063245,
+        "sir": 7.056213389868184,
+        "sar": 10.48899876518649,
+        "si_sdr": 5.172894910293001
+      },
+      "percussive": {
+        "sdr": -0.5736203608572426,
+        "sir": 13.783490222523586,
+        "sar": -0.2333454833926561,
+        "si_sdr": -0.5732812116605099
+      }
+    },
+    {
+      "track_id": "Concert04_07-Yenage-Bhoga-Bhagya-Beda",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 8.414871737164676,
+        "sir": 10.443542470986662,
+        "sar": 13.070946880463236,
+        "si_sdr": 8.41522523113441
+      },
+      "percussive": {
+        "sdr": -0.8103043827256327,
+        "sir": 13.065901725480305,
+        "sar": -0.41940192483394556,
+        "si_sdr": -0.810013999101916
+      }
+    },
+    {
+      "track_id": "Concert04_08-Tillana",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 4.265047945844589,
+        "sir": 6.797393887630911,
+        "sar": 8.636942895472641,
+        "si_sdr": 4.265338259490971
+      },
+      "percussive": {
+        "sdr": 0.8740042695443411,
+        "sir": 11.671413184810751,
+        "sar": 1.5373167774009378,
+        "si_sdr": 0.8742597539541719
+      }
+    },
+    {
+      "track_id": "Concert04_09-Mangalam",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 7.692563192802744,
+        "sir": 10.263935535505562,
+        "sar": 11.581775940491328,
+        "si_sdr": 7.692827829252378
+      },
+      "percussive": {
+        "sdr": -0.9755949718631741,
+        "sir": 10.533856529586984,
+        "sar": -0.2894145770006071,
+        "si_sdr": -0.9750710265526039
+      }
+    },
+    {
+      "track_id": "Concert05_01-Saami-Ninne",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 3.2236419481284524,
+        "sir": 5.860754999908923,
+        "sar": 7.643780248565127,
+        "si_sdr": 3.2237703585478967
+      },
+      "percussive": {
+        "sdr": 0.9112168967540719,
+        "sir": 7.673982619070099,
+        "sar": 2.6239463680240958,
+        "si_sdr": 0.9113392351757925
+      }
+    },
+    {
+      "track_id": "Concert05_01-Saami-Ninne-(Take-1)",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 3.9575003692564845,
+        "sir": 6.459838478305736,
+        "sar": 8.427877198412688,
+        "si_sdr": 3.9576358274626724
+      },
+      "percussive": {
+        "sdr": -1.4931612761051536,
+        "sir": 4.1507257396392445,
+        "sar": 1.3024419433705594,
+        "si_sdr": -1.4929884170280192
+      }
+    },
+    {
+      "track_id": "Concert05_02-Manasa-Yetulortune",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 3.5391265185664302,
+        "sir": 6.185779394222346,
+        "sar": 7.882891493086106,
+        "si_sdr": 3.539306752469007
+      },
+      "percussive": {
+        "sdr": 1.656478900088059,
+        "sir": 10.110420145473789,
+        "sar": 2.7294573840430267,
+        "si_sdr": 1.6566753134322678
+      }
+    },
+    {
+      "track_id": "Concert05_03-Durmargacharadhamulanu",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 17.160135173600196,
+        "sir": 37.462840488505684,
+        "sar": 17.201609591362338,
+        "si_sdr": 17.16064416940249
+      },
+      "percussive": {
+        "sdr": -34.30101747832715,
+        "sir": -22.944811533385703,
+        "sar": -11.004181291444242,
+        "si_sdr": -34.38563788651673
+      }
+    },
+    {
+      "track_id": "Concert05_04-Ranga-Naayakam",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 4.156345337034905,
+        "sir": 6.319753678838271,
+        "sar": 9.13059170197328,
+        "si_sdr": 4.156619845472872
+      },
+      "percussive": {
+        "sdr": 1.4632358059679986,
+        "sir": 10.477729584106761,
+        "sar": 2.4181084403452866,
+        "si_sdr": 1.4635183161663026
+      }
+    },
+    {
+      "track_id": "Concert05_05-Kripayapalaya",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 4.218133604565343,
+        "sir": 6.815815528277524,
+        "sar": 8.505690336348772,
+        "si_sdr": 4.218378897543341
+      },
+      "percussive": {
+        "sdr": 1.7188709742714168,
+        "sir": 9.625034799635841,
+        "sar": 2.9355611093033556,
+        "si_sdr": 1.7192947524938265
+      }
+    },
+    {
+      "track_id": "Concert05_06-Devki-Nandana",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 5.986939028372635,
+        "sir": 7.806294237947782,
+        "sar": 11.30951037025816,
+        "si_sdr": 5.987150265604864
+      },
+      "percussive": {
+        "sdr": -3.0598898016209026,
+        "sir": 4.759384384881295,
+        "sar": -1.023243008507506,
+        "si_sdr": -3.0596971541295073
+      }
+    },
+    {
+      "track_id": "Concert05_07-Muruganai-Bajimaname",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 6.126066496280589,
+        "sir": 9.275387101701801,
+        "sar": 9.486688070371873,
+        "si_sdr": 6.126477503855824
+      },
+      "percussive": {
+        "sdr": -1.0106242343858916,
+        "sir": 6.770562687217707,
+        "sar": 0.6103652021409643,
+        "si_sdr": -1.0101586046828623
+      }
+    },
+    {
+      "track_id": "Concert05_08-Tillana",
+      "mixture_is_synthetic": true,
+      "stems_scored": [
+        "mridangam",
+        "violin",
+        "vocal"
+      ],
+      "harmonic": {
+        "sdr": 2.1540510895060225,
+        "sir": 4.462598459216794,
+        "sar": 7.33039020782981,
+        "si_sdr": 2.1541627696720393
+      },
+      "percussive": {
+        "sdr": -0.0808371486361894,
+        "sir": 6.4826775111995705,
+        "sar": 1.8822148361069946,
+        "si_sdr": -0.08055001105783469
+      }
+    }
+  ],
+  "summary": {
+    "harmonic": {
+      "sdr": 6.844571740017793,
+      "sir": 10.26291843610618,
+      "sar": 10.51431184907648,
+      "si_sdr": 6.844875333078768
+    },
+    "percussive": {
+      "sdr": -1.276630227582323,
+      "sir": 8.673364394042999,
+      "sar": 0.8734507130120037,
+      "si_sdr": -1.280139185131016
+    }
+  }
+}

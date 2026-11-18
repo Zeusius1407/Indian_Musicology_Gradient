@@ -1,0 +1,8 @@
+{
+  "track": "Concert03_02-Sharanam-Bhavan",
+  "split": "validation (Concert03, held out from training)",
+  "start_seconds": 492.0,
+  "seconds": 30,
+  "sample_rate": 44100,
+  "mixture_is_synthetic": true
+}

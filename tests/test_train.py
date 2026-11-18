@@ -23,7 +23,7 @@ SOURCES = ["vocal", "violin", "mridangam", "ghatam"]
 torch = pytest.importorskip("torch")
 
 from indian_mss.data.sanidha import Sanidha  # noqa: E402
-from indian_mss.train.dataset import SegmentDataset, split_tracks, track_refs  # noqa: E402
+from indian_mss.train.dataset import SegmentDataset, concert_of, split_tracks, track_refs  # noqa: E402
 from indian_mss.train.loop import train  # noqa: E402
 
 BASE_CFG = {
@@ -65,6 +65,26 @@ def test_split_is_by_track_and_deterministic(corpus):
     tr, va = split_tracks(ds, 0.34, seed=0)
     assert set(tr).isdisjoint(va) and len(tr) + len(va) == 3 and len(va) == 1
     assert split_tracks(ds, 0.34, seed=0) == (tr, va)
+
+
+def test_split_holds_out_whole_concerts(tmp_path):
+    root = make_sanidha(tmp_path / "sanidha", n_tracks=6, duration=1.0, sample_rate=SR)
+    names = ["Concert01_01-A", "Concert01_02-B", "Concert02_01-C",
+             "Concert02_01-C-(Take-1)", "Concert03_01-D", "Concert03_02-E"]
+    for old, new in zip(sorted(root.iterdir()), names):
+        old.rename(root / new)
+    ds = Sanidha(root, SR)
+
+    tr, va = split_tracks(ds, 0.34, seed=0)
+    assert {concert_of(t) for t in tr}.isdisjoint({concert_of(t) for t in va})
+    assert len({concert_of(t) for t in va}) == 1  # round(3 * 0.34)
+
+    tr, va = split_tracks(ds, 0.34, seed=0, val_concerts=["Concert02"])
+    assert va == ["Concert02_01-C", "Concert02_01-C-(Take-1)"]  # takes stay together
+    with pytest.raises(ValueError, match="not in the corpus"):
+        split_tracks(ds, 0.34, seed=0, val_concerts=["Concert09"])
+    with pytest.raises(ValueError, match="every concert"):
+        split_tracks(ds, 0.34, seed=0, val_concerts=["Concert01", "Concert02", "Concert03"])
 
 
 def test_segment_dataset_mixture_is_sum_of_stems(corpus):

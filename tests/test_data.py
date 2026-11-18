@@ -87,3 +87,99 @@ def test_cli_records_the_tonic(tmp_path):
     record = json.loads((out / "mix_tonic.json").read_text())
     assert record["strategy"] == "condition"
     assert abs(1200 * np.log2(record["tonic_hz"] / 220.0)) < 25.0
+
+
+def test_saraga_indexes_concert_piece_nesting(tmp_path):
+    from conftest import make_saraga
+
+    from indian_mss.data import Saraga
+
+    make_saraga(tmp_path, n_concerts=2, sample_rate=SR)
+    ds = Saraga(tmp_path, SR)
+    assert len(ds) == 4
+    # Piece names repeat across concerts, so the concert must stay in the id.
+    assert ds.track_ids() == [
+        "Concert 0 by Some Artist/Athirum Kazhal",
+        "Concert 0 by Some Artist/Kanukontini",
+        "Concert 1 by Some Artist/Athirum Kazhal",
+        "Concert 1 by Some Artist/Kanukontini",
+    ]
+
+
+def test_saraga_sums_multi_mic_stems_and_skips_appledouble(tmp_path):
+    from conftest import make_saraga
+
+    from indian_mss.data import Saraga
+
+    make_saraga(tmp_path, n_concerts=1, sample_rate=SR)
+    ds = Saraga(tmp_path, SR)
+    paths = ds.stem_paths("Concert 0 by Some Artist/Kanukontini")
+    assert len(paths["mridangam"]) == 2  # left + right
+    assert len(paths["vocal"]) == 2  # main + second vocalist
+    assert len(paths["violin"]) == 1
+    assert not any(p.name.startswith("._") for ps in paths.values() for p in ps)
+
+
+def test_saraga_ghatam_only_on_a_subset(tmp_path):
+    from conftest import make_saraga
+
+    from indian_mss.data import Saraga
+
+    make_saraga(tmp_path, n_concerts=1, sample_rate=SR)
+    ds = Saraga(tmp_path, SR)
+    with_ghatam = ds.load("Concert 0 by Some Artist/Kanukontini")
+    without = ds.load("Concert 0 by Some Artist/Athirum Kazhal")
+    assert set(with_ghatam.stems) == {"vocal", "violin", "mridangam", "ghatam"}
+    assert set(without.stems) == {"vocal", "violin", "mridangam"}
+    # The gap is recorded, so a four-stem mean cannot silently average over
+    # tracks that never had a ghatam.
+    assert without.metadata["stems_missing"] == ["ghatam"]
+
+
+def test_saraga_default_mixture_is_the_sum_of_the_mics(tmp_path):
+    from conftest import make_saraga
+
+    from indian_mss.data import Saraga
+
+    make_saraga(tmp_path, n_concerts=1, sample_rate=SR)
+    item = Saraga(tmp_path, SR).load("Concert 0 by Some Artist/Kanukontini")
+    assert item.mixture_is_synthetic  # linear remix of real bled mics
+    assert item.metadata["mixture_mode"] == "stems"
+    assert np.allclose(item.mixture, np.sum(list(item.stems.values()), axis=0), atol=1e-5)
+
+
+def test_saraga_mixdown_mode_uses_the_released_master(tmp_path):
+    from conftest import make_saraga
+
+    from indian_mss.data import Saraga
+
+    make_saraga(tmp_path, n_concerts=1, sample_rate=SR)
+    item = Saraga(tmp_path, SR, mixture="mixdown").load("Concert 0 by Some Artist/Kanukontini")
+    assert not item.mixture_is_synthetic
+    assert item.metadata["mixture_mode"] == "mixdown"
+    # The master is engineered, not the sum of the mics -- the whole reason the
+    # two modes are not interchangeable.
+    assert not np.allclose(item.mixture, np.sum(list(item.stems.values()), axis=0), atol=1e-3)
+
+
+def test_saraga_names_the_hindustani_mistake(tmp_path):
+    """A mixture-only release must say so, not just "no tracks found"."""
+    from indian_mss.data import Saraga
+
+    piece = tmp_path / "Raag Shree by Someone" / "Raag Shree"
+    piece.mkdir(parents=True)
+    sf.write(piece / "Raag Shree.wav.wav", make_tone(1.0), SR)
+    with pytest.raises(ValueError, match="mixture-only"):
+        Saraga(tmp_path, SR)
+
+
+def test_saraga_rejects_unknown_stem_and_mixture_mode(tmp_path):
+    from conftest import make_saraga
+
+    from indian_mss.data import Saraga
+
+    make_saraga(tmp_path, n_concerts=1, sample_rate=SR)
+    with pytest.raises(ValueError, match="mixture must be"):
+        Saraga(tmp_path, SR, mixture="mixdown_or_something")
+    with pytest.raises(ValueError, match="tabla"):
+        Saraga(tmp_path, SR, stems=("vocal", "tabla"))

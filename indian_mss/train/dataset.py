@@ -1,8 +1,10 @@
 """Random-crop training examples from Sanidha, and the train/validation split.
 
-Split by *track*, never by segment: two crops of one recording share the
-room, the microphones and the performers, so a segment-level split leaks and
-the validation SDR stops measuring generalization.
+Split by *concert*, never by track or segment. Two crops of one recording
+share the room, the microphones and the performers; so do two songs from one
+concert, and alternate takes of one song are nearly the same audio. Any
+finer-grained split leaks, and the validation SDR then measures performers the
+model has already heard instead of the live, unseen ones Saraga tests on.
 """
 
 from __future__ import annotations
@@ -18,7 +20,7 @@ from ..data.base import load_segment
 from ..data.sanidha import Sanidha
 from .augment import augment_stems
 
-__all__ = ["TrackRef", "SegmentDataset", "split_tracks", "track_refs"]
+__all__ = ["TrackRef", "SegmentDataset", "concert_of", "split_tracks", "track_refs"]
 
 
 @dataclass(frozen=True)
@@ -30,17 +32,40 @@ class TrackRef:
     duration: float
 
 
-def split_tracks(dataset: Sanidha, val_fraction: float, seed: int) -> tuple[list[str], list[str]]:
-    """Deterministic track-level split. At least one track each way when possible."""
+def concert_of(track_id: str) -> str:
+    """The concert a Sanidha track belongs to: ``Concert04_01-Title`` -> ``Concert04``.
+
+    Alternate takes (``Concert04_01-Title-(Take-1)``) share the prefix, so they
+    always land on the same side of the split. An id with no underscore is a
+    concert of its own.
+    """
+    return track_id.split("_", 1)[0]
+
+
+def split_tracks(
+    dataset: Sanidha, val_fraction: float, seed: int, val_concerts: list[str] | None = None
+) -> tuple[list[str], list[str]]:
+    """Deterministic concert-level split: a held-out concert goes to validation whole.
+
+    ``val_concerts`` names the held-out concerts outright. Otherwise
+    ``round(n_concerts * val_fraction)`` of them are drawn with ``seed`` -- at
+    least one, and never every one, when there are two or more.
+    """
     ids = sorted(dataset.track_ids())
-    rng = np.random.default_rng(seed)
-    rng.shuffle(ids)
-    n_val = int(round(len(ids) * val_fraction))
-    if len(ids) >= 2:
-        n_val = min(max(n_val, 1), len(ids) - 1)
+    concerts = sorted({concert_of(t) for t in ids})
+    if val_concerts:
+        held = set(val_concerts)
+        if unknown := held - set(concerts):
+            raise ValueError(f"val_concerts {sorted(unknown)} not in the corpus; it has {concerts}")
+        if held == set(concerts):
+            raise ValueError("val_concerts holds out every concert, leaving nothing to train on")
     else:
-        n_val = 0
-    return sorted(ids[n_val:]), sorted(ids[:n_val])
+        rng = np.random.default_rng(seed)
+        rng.shuffle(concerts)
+        n_val = int(round(len(concerts) * val_fraction))
+        n_val = min(max(n_val, 1), len(concerts) - 1) if len(concerts) >= 2 else 0
+        held = set(concerts[:n_val])
+    return [t for t in ids if concert_of(t) not in held], [t for t in ids if concert_of(t) in held]
 
 
 class SegmentDataset(Dataset):

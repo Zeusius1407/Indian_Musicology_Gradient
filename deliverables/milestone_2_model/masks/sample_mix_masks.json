@@ -1,0 +1,28 @@
+{
+  "sources": [
+    "vocal",
+    "violin",
+    "mridangam",
+    "ghatam"
+  ],
+  "shape": [
+    4,
+    1025,
+    2585
+  ],
+  "stft": {
+    "sample_rate": 44100,
+    "n_fft": 2048,
+    "hop_length": 512,
+    "window": "hann"
+  },
+  "checkpoint": "checkpoints/htdemucs_concertsplit/best.pt",
+  "checkpoint_epoch": 56,
+  "checkpoint_val_sdr": {
+    "vocal": 9.299459584747327,
+    "violin": 7.105559891626314,
+    "mridangam": 12.237942819987952,
+    "ghatam": 6.9323557349737515
+  },
+  "backbone": "htdemucs"
+}

@@ -7,6 +7,7 @@ in exactly one place. A stem loaded at 48 kHz next to a mixture loaded at
 
 from __future__ import annotations
 
+import io
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -32,6 +33,21 @@ class TrackItem:
     metadata: dict = field(default_factory=dict)
 
 
+def _open(path: str | Path):
+    """Open ``path`` as a ``soundfile.SoundFile``.
+
+    libsndfile 1.2.2 refuses some MP3s by path ("bad data offset") -- every
+    Saraga close-mic stem, which starts on a bare Xing frame with no ID3 tag --
+    yet decodes the same bytes fine through a file object. Fall back to that.
+    """
+    import soundfile as sf
+
+    try:
+        return sf.SoundFile(str(path))
+    except sf.LibsndfileError:
+        return sf.SoundFile(io.BytesIO(Path(path).read_bytes()))
+
+
 def load_audio(path: str | Path, sample_rate: int) -> np.ndarray:
     """Load ``path`` as mono float32 at ``sample_rate``.
 
@@ -44,15 +60,14 @@ def load_audio(path: str | Path, sample_rate: int) -> np.ndarray:
     path = Path(path)
     if not path.is_file():
         raise FileNotFoundError(f"audio file not found: {path}")
-    audio, _ = librosa.load(path, sr=sample_rate, mono=True)
+    audio, _ = librosa.load(_open(path), sr=sample_rate, mono=True)
     return audio.astype(np.float32)
 
 
 def audio_duration(path: str | Path) -> float:
     """Duration in seconds, read from the header only."""
-    import soundfile as sf
-
-    return float(sf.info(str(path)).duration)
+    with _open(path) as f:
+        return f.frames / f.samplerate
 
 
 def load_segment(path: str | Path, sample_rate: int, start_seconds: float, seconds: float) -> np.ndarray:
@@ -63,10 +78,8 @@ def load_segment(path: str | Path, sample_rate: int, start_seconds: float, secon
     ``round(seconds * sample_rate)`` samples (zero-padded past the end of the
     file), which keeps stems from different files sample-aligned.
     """
-    import soundfile as sf
-
     n_out = int(round(seconds * sample_rate))
-    with sf.SoundFile(str(path)) as f:
+    with _open(path) as f:
         native = f.samplerate
         f.seek(min(int(round(start_seconds * native)), f.frames))
         audio = f.read(int(round(seconds * native)), dtype="float32", always_2d=True)

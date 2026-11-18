@@ -40,7 +40,8 @@ augment:
 train:
   backbone: htdemucs      # 'htdemucs' | 'unet'
   seed: 0
-  val_fraction: 0.15      # split by TRACK, never by segment
+  val_fraction: 0.15      # share of CONCERTS held out, never tracks or segments
+  val_concerts: [Concert03]   # pinned: the only held-out choice that also validates ghatam
   val_seconds: 60.0       # central excerpt of each validation track
   segment_seconds: 7.8    # htdemucs was pretrained on 7.8 s; also the inference chunk
   samples_per_epoch: 2000 # random crops drawn per epoch

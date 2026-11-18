@@ -27,6 +27,7 @@ dev = ["pytest>=7.4"]
 imss-preprocess = "indian_mss.cli.preprocess:main"
 imss-train = "indian_mss.cli.train:main"
 imss-separate = "indian_mss.cli.separate:main"
+imss-evaluate = "indian_mss.cli.evaluate:main"
 
 [tool.setuptools.packages.find]
 include = ["indian_mss*"]

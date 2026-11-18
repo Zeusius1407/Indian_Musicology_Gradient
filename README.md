@@ -37,7 +37,7 @@ matches your CUDA version from pytorch.org, then `pip install -e ".[train]"`.
 | Corpus | Role | Why |
 |---|---|---|
 | **Sanidha** ([arXiv:2501.06959](https://arxiv.org/abs/2501.06959)) | training | Studio Carnatic multitrack, artists playing together in isolation booths — near-zero bleed, so the masks learn the instrument and not the room. |
-| **Saraga** | test only | Full live concerts *with* bleed. Training on it teaches the model that leakage belongs in the target; evaluating on it is the only honest generalization number. |
+| **Saraga** ([Zenodo 4301737](https://zenodo.org/records/4301737)) | test only | Full live concerts *with* bleed. Training on it teaches the model that leakage belongs in the target; evaluating on it is the only honest generalization number. Use `saraga1.5_carnatic.zip` — 168 of its 249 recordings ship multitrack stems. The Hindustani release is mixture-only and cannot produce a separation metric at all. |
 | **IMIDataset** | classifier only | 10 instrument classes, ~33 h. Milestone 4 input. |
 
 Point the paths in `configs/default.yaml` at the extracted folders. Each loader
@@ -154,10 +154,19 @@ Saraga number. How it is built:
 * *Other augmentation.* Per-stem gain, one shared pitch shift (the ensemble stays
   in tune with itself), and stems shuffled across tracks.
 * *Selection.* `best.pt` is chosen by mean validation SDR, never loss, with SDR
-  logged per stem. Validation tracks are held out whole, never as segments.
+  logged per stem. Validation holds out whole *concerts* (`train.val_concerts`), never
+  tracks or segments: songs from one concert share performers, room and mics,
+  and alternate takes are near-duplicates, so anything finer leaks.
 * *Tonic.* Training does not pitch-normalize whole tracks; the ±2 semitone shift
   augmentation covers tonic variation instead, and separation runs on raw audio.
-* *Still to do:* `data/saraga.py`, then evaluate `best.pt` on Saraga.
+* *Still to do:* the training run, then evaluate `best.pt` on Saraga. `data/saraga.py`
+  is in place: 168 live multitracks, mridangam summed from its two close mics, ghatam
+  on only 46 of them (so quote the three-stem mean over all 168 and the four-stem mean
+  over the 46 separately, never one mean over both). Its `mixture` argument is a real
+  choice, not a default to ignore — the released master is separately engineered and is
+  *not* the sum of the close mics, which BSS-Eval assumes; `mixture="stems"` remixes the
+  mics linearly, keeping every bit of the live bleed while satisfying that assumption,
+  and `mixture="mixdown"` scores the master listeners actually hear. Report both.
 
 **Milestone 3** — the mixture-phase ISTFT path already works and is the correct
 baseline. Compare it against Griffin-Lim and a HiFi-GAN vocoder both numerically
@@ -174,7 +183,7 @@ much bleed is left.
 
 ```
 indian_mss/
-  data/     base.py sanidha.py                    — loaders (saraga.py, imi.py to build)
+  data/     base.py sanidha.py saraga.py          — loaders (imi.py to build)
   dsp/      stft.py hpss.py tonic.py features.py  — Milestone 1
   models/   separator.py demucs_backbone.py unet.py spec.py — Milestone 2 models
   train/    augment.py dataset.py losses.py loop.py report.py — Milestone 2 training

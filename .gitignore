@@ -9,3 +9,5 @@ checkpoints/
 *.wav
 *.npy
 !tests/fixtures/*.wav
+*.log
+*.pt

@@ -7,7 +7,8 @@
 3. HPSS baseline table, loaded from `out/hpss_baseline.json`. *(done)*
 4. Training loop with loss curves (per step, per epoch, validation). *(done)*
 5. Per-stem validation SDR per epoch, on one axis with the baseline drawn in. *(done)*
-6. Final evaluation: Sanidha held-out *(done)*, then Saraga (needs `data/saraga.py`).
+6. Final evaluation: Sanidha held-out *(done)*, then Saraga — `data/saraga.py` is in
+   place, so this needs only a trained `best.pt` and the extracted `saraga1.5_carnatic`.
 7. Milestone 4 confusion matrices for the three classifier inputs.
 
 The charts come from `indian_mss/train/report.py`; set `RUN_TRAINING = False` to

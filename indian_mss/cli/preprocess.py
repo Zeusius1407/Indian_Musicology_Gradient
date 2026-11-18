@@ -22,6 +22,11 @@ percussive stems), which is the number the neural model must beat in
 Milestone 2::
 
     python scripts/preprocess.py --sanidha-root data/sanidha --evaluate
+
+Only the central ``--seconds`` of each track is scored (default
+``train.val_seconds``, the excerpt HTDemucs is validated and tested on), so
+the two numbers are comparable -- and a 45-minute concert no longer has to fit
+in RAM. ``--seconds 0`` scores whole tracks.
 """
 
 from __future__ import annotations
@@ -57,6 +62,7 @@ CONFIG_KEYS = (
     ("tonic_strategy", "tonic", "strategy", "none"),
     ("canonical_hz", "tonic", "canonical_hz", 146.83),
     ("sanidha_root", "data", "sanidha_root", "data/sanidha"),
+    ("seconds", "train", "val_seconds", 60.0),
 )
 
 
@@ -151,6 +157,7 @@ def run_single(args: argparse.Namespace) -> None:
 
 
 def run_evaluate(args: argparse.Namespace) -> None:
+    from indian_mss.cli.evaluate import _crop_centre
     from indian_mss.data.sanidha import Sanidha
     from indian_mss.dsp.hpss import hpss_audio
 
@@ -163,12 +170,13 @@ def run_evaluate(args: argparse.Namespace) -> None:
     track_ids = dataset.track_ids()[: args.limit] if args.limit else dataset.track_ids()
     for tid in track_ids:
         item = dataset.load(tid)
-        est = hpss_audio(item.mixture, stft_cfg, hpss_cfg)
+        mixture, stems, _ = _crop_centre(item, float(args.seconds))
+        est = hpss_audio(mixture, stft_cfg, hpss_cfg)
 
         # Collapse ground truth to the two HPSS categories.
         refs = {}
-        harm = [item.stems[s] for s in HARMONIC_STEMS if s in item.stems]
-        perc = [item.stems[s] for s in PERCUSSIVE_STEMS if s in item.stems]
+        harm = [stems[s] for s in HARMONIC_STEMS if s in stems]
+        perc = [stems[s] for s in PERCUSSIVE_STEMS if s in stems]
         if harm:
             refs["harmonic"] = np.sum(harm, axis=0)
         if perc:
@@ -209,7 +217,8 @@ def run_evaluate(args: argparse.Namespace) -> None:
 
     n_synthetic = sum(r["mixture_is_synthetic"] for r in rows)
 
-    print("\n=== HPSS baseline (mean over tracks) ===")
+    excerpt = f"central {float(args.seconds):g} s" if args.seconds else "whole tracks"
+    print(f"\n=== HPSS baseline (mean over tracks, {excerpt}) ===")
     for category, metrics in summary.items():
         print(
             f"{category:12s} SDR {metrics['sdr']:+6.2f} dB   "
@@ -234,6 +243,7 @@ def run_evaluate(args: argparse.Namespace) -> None:
                         "window": stft_cfg.window,
                     },
                     "config_file": str(args.config or DEFAULT_CONFIG_PATH),
+                    "seconds": float(args.seconds),
                     "hpss": {
                         "harmonic_ms": hpss_cfg.harmonic_ms,
                         "percussive_hz": hpss_cfg.percussive_hz,
@@ -275,6 +285,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--evaluate", action="store_true", help="score HPSS against Sanidha ground truth")
     p.add_argument("--sanidha-root", type=str, default=None)
     p.add_argument("--limit", type=int, default=0, help="score only the first N tracks")
+    p.add_argument("--seconds", type=float, default=None, help="central excerpt per track; 0 = whole track")
 
     # Defaults are None so that "not given" can be told apart from "given the
     # same value as the config" -- unset flags are filled by resolve_args.

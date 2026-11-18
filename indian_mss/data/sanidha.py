@@ -61,7 +61,13 @@ class Sanidha:
     def _index(self) -> dict[str, dict]:
         tracks: dict[str, dict] = {}
         for track_dir in sorted(p for p in self.root.iterdir() if p.is_dir()):
-            files = [f for f in track_dir.iterdir() if f.suffix.lower() in AUDIO_EXTENSIONS]
+            # ``._vocals.wav`` is an AppleDouble resource fork from a macOS copy,
+            # not audio -- and its name would otherwise match the stem.
+            files = [
+                f
+                for f in track_dir.iterdir()
+                if f.suffix.lower() in AUDIO_EXTENSIONS and not f.name.startswith("._")
+            ]
             if not files:
                 continue
             mixture = next((f for f in files if _is_mixture(f)), None)
