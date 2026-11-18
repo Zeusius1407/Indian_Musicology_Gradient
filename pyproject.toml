@@ -20,6 +20,7 @@ dependencies = [
 [project.optional-dependencies]
 train = ["torch>=2.1", "torchaudio>=2.1", "demucs>=4.0", "tqdm>=4.66"]
 eval = ["museval>=0.4"]
+vocoder = ["huggingface_hub>=0.23"]
 iam = ["compiam>=0.4"]
 dev = ["pytest>=7.4"]
 
@@ -28,6 +29,8 @@ imss-preprocess = "indian_mss.cli.preprocess:main"
 imss-train = "indian_mss.cli.train:main"
 imss-separate = "indian_mss.cli.separate:main"
 imss-evaluate = "indian_mss.cli.evaluate:main"
+imss-resynthesize = "indian_mss.cli.resynthesize:main"
+imss-compare-resynthesis = "indian_mss.cli.compare_resynthesis:main"
 
 [tool.setuptools.packages.find]
 include = ["indian_mss*"]

@@ -1,0 +1,11 @@
+{
+  "masks": "deliverables/milestone_2_model/masks/sample_mix_masks.npy",
+  "input": "deliverables/sample/sample_mix.wav",
+  "resynthesis": {
+    "method": "mixture_phase",
+    "griffin_lim_iters": 32,
+    "griffin_lim_init": "random",
+    "griffin_lim_momentum": 0.99,
+    "vocoder": "nvidia/bigvgan_v2_44khz_128band_512x"
+  }
+}

@@ -8,7 +8,7 @@ for plus the evidence behind it. Every milestone is run on the same input: a
 |---|---|---|---|
 | 1 | Script returning a melodic and a percussive spectrogram array | `milestone_1_preprocessing/` | done |
 | 2 | Model save state predicting mask ratios for Indian instruments | `milestone_2_model/` | done |
-| 3 | Isolated `.wav` stems per instrument | `milestone_3_resynthesis/` | stems delivered; ISTFT / Griffin-Lim / vocoder comparison not built |
+| 3 | Isolated `.wav` stems per instrument | `milestone_3_resynthesis/` | done: mixture-phase ISTFT stems, compared with Griffin-Lim on held-out Concert03; vocoder built, run pending |
 | 4 | Classification-accuracy report on separated stems | `milestone_4_classifier/` | not started (blocked on IMIDataset access) |
 
 Core software artefacts: the pipeline library is `indian_mss/` at the repo root,
@@ -32,8 +32,17 @@ python scripts/preprocess.py --input deliverables/sample/sample_mix.wav \
     --outdir deliverables/milestone_1_preprocessing/output --write-audio
 python scripts/separate.py --checkpoint deliverables/milestone_2_model/checkpoint/best.pt \
     --input deliverables/sample/sample_mix.wav --outdir deliverables/milestone_2_model/masks
-mv deliverables/milestone_2_model/masks/*.wav deliverables/milestone_3_resynthesis/stems/
+mv deliverables/milestone_2_model/masks/*.wav deliverables/milestone_3_resynthesis/direct_htdemucs/
+python scripts/resynthesize.py --masks deliverables/milestone_2_model/masks/sample_mix_masks.npy \
+    --input deliverables/sample/sample_mix.wav --outdir deliverables/milestone_3_resynthesis/stems
+python scripts/compare_resynthesis.py --checkpoint deliverables/milestone_2_model/checkpoint/best.pt \
+    --sanidha-root data/sanidha_flat --outdir deliverables/milestone_3_resynthesis/heldout
+python scripts/compare_resynthesis.py --checkpoint deliverables/milestone_2_model/checkpoint/best.pt \
+    --sample deliverables/sample --clip-seconds 0 --outdir deliverables/milestone_3_resynthesis/sample
 ```
+
+Add `--methods direct mixture_phase griffin_lim griffin_lim_mixinit oracle_mixture_phase`
+to either comparison to leave out the vocoder.
 
 `*.wav`, `*.npy` and `*.pt` are git-ignored, so this folder is for handing in
 (zip it), not for committing.

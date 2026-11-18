@@ -30,7 +30,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-__all__ = ["BSSMetrics", "bss_eval", "evaluate_stems", "si_sdr"]
+__all__ = ["BSSMetrics", "bss_eval", "evaluate_stems", "magnitude_snr", "si_sdr"]
 
 _EPS = 1e-10
 
@@ -142,3 +142,21 @@ def evaluate_stems(
         row["si_sdr"] = si_sdr(estimates[name], references[name])
         results[name] = row
     return results
+
+
+def magnitude_snr(estimate: np.ndarray, target: np.ndarray, stft_cfg=None) -> float:
+    """Phase-blind quality: ``10 log10(||M||^2 / ||M_est - M||^2)`` on STFT magnitudes.
+
+    BSS-Eval projects waveforms, so any estimate with the right spectrum but
+    its own phase -- Griffin-Lim from random phase, a neural vocoder -- scores
+    near or below 0 dB SDR even when it sounds right. This is the negated
+    spectral convergence of Griffin & Lim, in dB: higher is better, and it is
+    comparable across resynthesis methods where SDR is not.
+    """
+    from ..dsp.stft import STFTConfig, stft
+
+    cfg = stft_cfg or STFTConfig()
+    n = min(len(estimate), len(target))
+    m_est = np.abs(stft(estimate[:n], cfg))
+    m_ref = np.abs(stft(target[:n], cfg))
+    return float(10.0 * np.log10((np.sum(m_ref**2) + _EPS) / (np.sum((m_est - m_ref) ** 2) + _EPS)))

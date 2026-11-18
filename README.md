@@ -17,7 +17,7 @@ that measures how much cross-instrument bleed actually survived.
 |---|---|---|
 | 1 | STFT front end, HPSS, tonic normalization, SDR metrics | **done** |
 | 2 | HTDemucs / U-Net fine-tuning on Sanidha, mask prediction | **done** — needs a GPU run on real data |
-| 3 | ISTFT / Griffin-Lim / vocoder resynthesis | ISTFT path done, in `dsp/hpss.py` |
+| 3 | ISTFT / Griffin-Lim / vocoder resynthesis | **done**: all three in `infer/`, compared on held-out Concert03 (vocoder run pending) |
 | 4 | MFCC + 2-D CNN instrument classifier | feature extraction done |
 
 ## Install
@@ -80,6 +80,21 @@ python scripts/separate.py --checkpoint checkpoints/htdemucs/best.pt --input con
 the same STFT grid as the Milestone 1 spectrograms, summing to one per bin — plus
 one `.wav` per instrument. `notebooks/train.ipynb` runs the training and charts the
 loss curves and per-stem validation SDR.
+
+Milestone 3: turn those masks into stems, and compare resynthesis methods
+against ground truth:
+
+```bash
+python scripts/resynthesize.py --masks out/concert_masks.npy --input concert.wav --outdir out/stems  # --method griffin_lim | vocoder
+python scripts/compare_resynthesis.py --checkpoint checkpoints/htdemucs/best.pt --outdir out/resynthesis
+```
+
+`resynthesize.py` uses `resynthesis.method` from the config (default
+`mixture_phase`: mask × mixture STFT → ISTFT). `compare_resynthesis.py` runs
+every method on the checkpoint's held-out tracks and writes SDR / SIR / SAR /
+SI-SDR plus a phase-blind magnitude SNR per stem, and listening clips. The
+vocoder (BigVGAN, `pip install -e ".[vocoder]"`) downloads its weights and
+model code from Hugging Face on first use.
 
 Library use:
 
@@ -168,10 +183,13 @@ Saraga number. How it is built:
   mics linearly, keeping every bit of the live bleed while satisfying that assumption,
   and `mixture="mixdown"` scores the master listeners actually hear. Report both.
 
-**Milestone 3** — the mixture-phase ISTFT path already works and is the correct
-baseline. Compare it against Griffin-Lim and a HiFi-GAN vocoder both numerically
-and by ear; vocoders often score *worse* on SDR while sounding better, and
-documenting that tension is a stronger result than picking whichever number wins.
+**Milestone 3** — implemented in `infer/`: mixture-phase ISTFT (the baseline),
+fast Griffin-Lim (random or mixture-phase init) and a pretrained BigVGAN vocoder
+(HiFi-GAN generator, trained on music as well as speech, at the pipeline's own
+44.1 kHz / hop-512 grid). Results are in
+`deliverables/milestone_3_resynthesis/`. *Still to do:* the vocoder run, then
+listening tests. Vocoders often score *worse* on SDR while sounding better, so
+judge them on `mag_snr` and by ear.
 
 **Milestone 4** — train the 2-D CNN on IMIDataset, then run it on three inputs:
 ground-truth Sanidha stems, your separated stems, and the raw mixture. If
@@ -187,11 +205,12 @@ indian_mss/
   dsp/      stft.py hpss.py tonic.py features.py  — Milestone 1
   models/   separator.py demucs_backbone.py unet.py spec.py — Milestone 2 models
   train/    augment.py dataset.py losses.py loop.py report.py — Milestone 2 training
-  infer/                                           — Milestone 3 CLI (to build)
-  eval/     sdr.py                                 — SDR / SIR / SAR / SI-SDR
+  infer/    resynth.py vocoder.py                  — Milestone 3 resynthesis
+  eval/     sdr.py                                 — SDR / SIR / SAR / SI-SDR / magnitude SNR
 configs/default.yaml                               — all hyperparameters
 scripts/preprocess.py                              — Milestone 1 CLI
 scripts/train.py  scripts/separate.py              — Milestone 2 CLIs
+scripts/resynthesize.py  scripts/compare_resynthesis.py — Milestone 3 CLIs
 notebooks/train.ipynb                              — training run + charts
 tests/                                             — run without any dataset
 ```

@@ -67,6 +67,9 @@ train:
 resynthesis:
   method: mixture_phase   # 'mixture_phase' | 'griffin_lim' | 'vocoder'
   griffin_lim_iters: 32
+  griffin_lim_init: random    # 'random' (phase unknown) | 'mixture' (refine the mixture phase)
+  griffin_lim_momentum: 0.99  # fast Griffin-Lim; 0 = the original algorithm
+  vocoder: nvidia/bigvgan_v2_44khz_128band_512x  # 44.1 kHz, hop 512: the pipeline's own STFT grid
 
 classifier:
   sample_rate: 22050
