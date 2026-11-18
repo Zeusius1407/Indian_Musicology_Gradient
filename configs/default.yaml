@@ -22,7 +22,7 @@ tonic:
 data:
   sanidha_root: data/sanidha        # training: clean stems, no bleed
   saraga_root: data/saraga          # test only: real live bleed
-  imi_root: data/imi                # classifier only
+  imi_root: data/IMIDataset         # classifier only
   stems: [vocal, violin, mridangam, ghatam]
 
 augment:
@@ -76,6 +76,16 @@ classifier:
   n_mfcc: 40
   window_seconds: 1.0
   hop_seconds: 0.5
+  silence_db: -50.0       # windows quieter than this (dBFS RMS) are silence...
+  silence_rel_db: -30.0   # ...and so are those 30 dB below the stem's loud (95th pct) level
+  fmax: 8000.0            # IMIDataset piano is all 16 kHz: above 8 kHz, "no energy" would mean piano
+  use_imi: true           # IMIDataset's 10 classes + Sanidha's vocal/mridangam/ghatam; false = Sanidha only
+  imi_block: 100          # IMIDataset split unit: blocks of consecutive clip numbers (clips are excerpts)
+  windows_per_class: 4000 # same budget per instrument, split between corpora, then recordings
+  gain_aug_db: 6.0        # random level shift on c0, so close-mic gain is not a cue
   epochs: 30
+  batch_size: 128
   lr: 1.0e-3
+  seed: 0
+  test_concerts: [Concert03]  # = the separator's held-out concert: unseen by both networks
   split_by: recording     # never by window -- adjacent windows leak

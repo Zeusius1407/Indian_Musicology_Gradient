@@ -18,7 +18,7 @@ that measures how much cross-instrument bleed actually survived.
 | 1 | STFT front end, HPSS, tonic normalization, SDR metrics | **done** |
 | 2 | HTDemucs / U-Net fine-tuning on Sanidha, mask prediction | **done** — needs a GPU run on real data |
 | 3 | ISTFT / Griffin-Lim / vocoder resynthesis | **done**: all three in `infer/`, compared on held-out Concert03 (vocoder run pending) |
-| 4 | MFCC + 2-D CNN instrument classifier | feature extraction done |
+| 4 | MFCC + 2-D CNN instrument classifier | **done**: trained on IMIDataset + Sanidha (13 classes); separated stems 94.8% balanced accuracy vs 95.7% clean, 22.3% raw mix |
 
 ## Install
 
@@ -38,7 +38,7 @@ matches your CUDA version from pytorch.org, then `pip install -e ".[train]"`.
 |---|---|---|
 | **Sanidha** ([arXiv:2501.06959](https://arxiv.org/abs/2501.06959)) | training | Studio Carnatic multitrack, artists playing together in isolation booths — near-zero bleed, so the masks learn the instrument and not the room. |
 | **Saraga** ([Zenodo 4301737](https://zenodo.org/records/4301737)) | test only | Full live concerts *with* bleed. Training on it teaches the model that leakage belongs in the target; evaluating on it is the only honest generalization number. Use `saraga1.5_carnatic.zip` — 168 of its 249 recordings ship multitrack stems. The Hindustani release is mixture-only and cannot produce a separation metric at all. |
-| **IMIDataset** | classifier only | 10 instrument classes, ~33 h. Milestone 4 input. |
+| **IMIDataset** | classifier only | 10 instrument classes; this release holds 8628 distinct clips (~13.8 h) once its duplicate part `Imid-06` and copied clips are dropped. No voice, mridangam or ghatam class, so Sanidha's clean stems add those three. `data/imi.py` documents the release's quirks. |
 
 Point the paths in `configs/default.yaml` at the extracted folders. Each loader
 raises a specific error if the layout differs from what it expects — check the
@@ -95,6 +95,15 @@ every method on the checkpoint's held-out tracks and writes SDR / SIR / SAR /
 SI-SDR plus a phase-blind magnitude SNR per stem, and listening clips. The
 vocoder (BigVGAN, `pip install -e ".[vocoder]"`) downloads its weights and
 model code from Hugging Face on first use.
+
+Milestone 4: train the timbre classifier, then classify ground-truth, separated
+and mixed audio of the held-out concert:
+
+```bash
+python scripts/train_classifier.py --outdir checkpoints/classifier   # --no-imi: Sanidha's 4 stems only
+python scripts/evaluate_classifier.py --classifier checkpoints/classifier/classifier.pt \
+    --separator checkpoints/htdemucs/best.pt --outdir out/classifier
+```
 
 Library use:
 
@@ -191,26 +200,34 @@ fast Griffin-Lim (random or mixture-phase init) and a pretrained BigVGAN vocoder
 listening tests. Vocoders often score *worse* on SDR while sounding better, so
 judge them on `mag_snr` and by ear.
 
-**Milestone 4** — train the 2-D CNN on IMIDataset, then run it on three inputs:
-ground-truth Sanidha stems, your separated stems, and the raw mixture. If
-separation worked, the separated stems sit near ground truth and far above the
-mixture, and the off-diagonal mass in the confusion matrix quantifies exactly how
-much bleed is left.
+**Milestone 4** — implemented in `classify/`: MFCC (+ deltas) windows into a
+~100k-parameter 2-D CNN over 13 classes, IMIDataset's ten plus Sanidha's vocal,
+mridangam and ghatam, split by recording (IMIDataset by block of consecutive clips,
+which are excerpts of longer recordings). 97.6% balanced accuracy on held-out
+IMIDataset clips. On held-out Concert03 the same windows are classified as
+ground-truth stem, separated stem, a −12 dB simulated-bleed control, and raw
+mixture: 95.7% / 94.8% / 52.1% / 22.3% balanced accuracy. The control
+shows the classifier does detect bleed, so separated stems scoring near clean ones
+means little bleed is left. Report: `deliverables/milestone_4_classifier/`.
+*Still to do:* the same test on Saraga's live close mics, which needs a window
+rule that does not rely on a clean reference.
 
 ## Layout
 
 ```
 indian_mss/
-  data/     base.py sanidha.py saraga.py          — loaders (imi.py to build)
+  data/     base.py sanidha.py saraga.py imi.py   — loaders
   dsp/      stft.py hpss.py tonic.py features.py  — Milestone 1
   models/   separator.py demucs_backbone.py unet.py spec.py — Milestone 2 models
   train/    augment.py dataset.py losses.py loop.py report.py — Milestone 2 training
   infer/    resynth.py vocoder.py                  — Milestone 3 resynthesis
   eval/     sdr.py                                 — SDR / SIR / SAR / SI-SDR / magnitude SNR
+  classify/ data.py model.py train.py evaluate.py report.py — Milestone 4 timbre classifier
 configs/default.yaml                               — all hyperparameters
 scripts/preprocess.py                              — Milestone 1 CLI
 scripts/train.py  scripts/separate.py              — Milestone 2 CLIs
 scripts/resynthesize.py  scripts/compare_resynthesis.py — Milestone 3 CLIs
+scripts/train_classifier.py  scripts/evaluate_classifier.py — Milestone 4 CLIs
 notebooks/train.ipynb                              — training run + charts
 tests/                                             — run without any dataset
 ```

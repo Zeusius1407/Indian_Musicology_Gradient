@@ -31,6 +31,8 @@ imss-separate = "indian_mss.cli.separate:main"
 imss-evaluate = "indian_mss.cli.evaluate:main"
 imss-resynthesize = "indian_mss.cli.resynthesize:main"
 imss-compare-resynthesis = "indian_mss.cli.compare_resynthesis:main"
+imss-train-classifier = "indian_mss.cli.train_classifier:main"
+imss-evaluate-classifier = "indian_mss.cli.evaluate_classifier:main"
 
 [tool.setuptools.packages.find]
 include = ["indian_mss*"]

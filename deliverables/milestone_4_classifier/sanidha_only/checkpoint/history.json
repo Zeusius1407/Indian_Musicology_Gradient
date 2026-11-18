@@ -1,0 +1,383 @@
+{
+  "epochs": [
+    {
+      "epoch": 1,
+      "train_loss": 0.15535128832170159,
+      "val_balanced_acc": 0.9837246696035242,
+      "val_acc": {
+        "vocal": 0.9673333333333334,
+        "violin": 0.9726666666666667,
+        "mridangam": 0.996,
+        "ghatam": 0.998898678414097
+      }
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.030164486275114245,
+      "val_balanced_acc": 0.9873333333333334,
+      "val_acc": {
+        "vocal": 0.9713333333333334,
+        "violin": 0.986,
+        "mridangam": 0.992,
+        "ghatam": 1.0
+      }
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.018380773383519382,
+      "val_balanced_acc": 0.9935653450807636,
+      "val_acc": {
+        "vocal": 0.984,
+        "violin": 0.9953333333333333,
+        "mridangam": 0.9993333333333333,
+        "ghatam": 0.9955947136563876
+      }
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.012635047466406394,
+      "val_balanced_acc": 0.9950073421439061,
+      "val_acc": {
+        "vocal": 0.9873333333333333,
+        "violin": 0.9973333333333333,
+        "mridangam": 0.9986666666666667,
+        "ghatam": 0.9966960352422908
+      }
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.010533316179067309,
+      "val_balanced_acc": 0.9970073421439061,
+      "val_acc": {
+        "vocal": 0.9953333333333333,
+        "violin": 0.9966666666666667,
+        "mridangam": 0.9993333333333333,
+        "ghatam": 0.9966960352422908
+      }
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.006852533710310833,
+      "val_balanced_acc": 0.9977246696035242,
+      "val_acc": {
+        "vocal": 0.994,
+        "violin": 0.998,
+        "mridangam": 1.0,
+        "ghatam": 0.998898678414097
+      }
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.0056371482076994954,
+      "val_balanced_acc": 0.996398678414097,
+      "val_acc": {
+        "vocal": 0.9926666666666667,
+        "violin": 0.9973333333333333,
+        "mridangam": 1.0,
+        "ghatam": 0.9955947136563876
+      }
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.006023122554903766,
+      "val_balanced_acc": 0.9978333333333333,
+      "val_acc": {
+        "vocal": 0.992,
+        "violin": 0.9993333333333333,
+        "mridangam": 1.0,
+        "ghatam": 1.0
+      }
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.0034529733991800486,
+      "val_balanced_acc": 0.9985,
+      "val_acc": {
+        "vocal": 0.9986666666666667,
+        "violin": 0.9966666666666667,
+        "mridangam": 0.9986666666666667,
+        "ghatam": 1.0
+      }
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.004851316721486451,
+      "val_balanced_acc": 0.9987246696035242,
+      "val_acc": {
+        "vocal": 0.9986666666666667,
+        "violin": 0.9973333333333333,
+        "mridangam": 1.0,
+        "ghatam": 0.998898678414097
+      }
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.003000539360611802,
+      "val_balanced_acc": 0.9978333333333333,
+      "val_acc": {
+        "vocal": 0.9946666666666667,
+        "violin": 0.9966666666666667,
+        "mridangam": 1.0,
+        "ghatam": 1.0
+      }
+    },
+    {
+      "epoch": 12,
+      "train_loss": 0.0024278065293783253,
+      "val_balanced_acc": 0.9993333333333333,
+      "val_acc": {
+        "vocal": 0.9973333333333333,
+        "violin": 1.0,
+        "mridangam": 1.0,
+        "ghatam": 1.0
+      }
+    },
+    {
+      "epoch": 13,
+      "train_loss": 0.003274617552047895,
+      "val_balanced_acc": 0.9993333333333333,
+      "val_acc": {
+        "vocal": 0.9973333333333333,
+        "violin": 1.0,
+        "mridangam": 1.0,
+        "ghatam": 1.0
+      }
+    },
+    {
+      "epoch": 14,
+      "train_loss": 0.0023798693510407314,
+      "val_balanced_acc": 0.9986740088105728,
+      "val_acc": {
+        "vocal": 1.0,
+        "violin": 0.998,
+        "mridangam": 1.0,
+        "ghatam": 0.9966960352422908
+      }
+    },
+    {
+      "epoch": 15,
+      "train_loss": 0.0023064770131509807,
+      "val_balanced_acc": 0.9996666666666667,
+      "val_acc": {
+        "vocal": 0.9993333333333333,
+        "violin": 0.9993333333333333,
+        "mridangam": 1.0,
+        "ghatam": 1.0
+      }
+    },
+    {
+      "epoch": 16,
+      "train_loss": 0.0013694056586603179,
+      "val_balanced_acc": 0.9995,
+      "val_acc": {
+        "vocal": 0.9993333333333333,
+        "violin": 0.9986666666666667,
+        "mridangam": 1.0,
+        "ghatam": 1.0
+      }
+    },
+    {
+      "epoch": 17,
+      "train_loss": 0.0013885619786607804,
+      "val_balanced_acc": 0.9996666666666667,
+      "val_acc": {
+        "vocal": 0.9993333333333333,
+        "violin": 0.9993333333333333,
+        "mridangam": 1.0,
+        "ghatam": 1.0
+      }
+    },
+    {
+      "epoch": 18,
+      "train_loss": 0.0008676933103092811,
+      "val_balanced_acc": 0.9996666666666667,
+      "val_acc": {
+        "vocal": 0.9993333333333333,
+        "violin": 0.9993333333333333,
+        "mridangam": 1.0,
+        "ghatam": 1.0
+      }
+    },
+    {
+      "epoch": 19,
+      "train_loss": 0.0010239207688151244,
+      "val_balanced_acc": 0.9987246696035242,
+      "val_acc": {
+        "vocal": 0.9986666666666667,
+        "violin": 0.9973333333333333,
+        "mridangam": 1.0,
+        "ghatam": 0.998898678414097
+      }
+    },
+    {
+      "epoch": 20,
+      "train_loss": 0.0006841086436034293,
+      "val_balanced_acc": 0.9996666666666667,
+      "val_acc": {
+        "vocal": 0.9993333333333333,
+        "violin": 0.9993333333333333,
+        "mridangam": 1.0,
+        "ghatam": 1.0
+      }
+    },
+    {
+      "epoch": 21,
+      "train_loss": 0.0005888627774009952,
+      "val_balanced_acc": 0.9990073421439061,
+      "val_acc": {
+        "vocal": 0.9993333333333333,
+        "violin": 1.0,
+        "mridangam": 1.0,
+        "ghatam": 0.9966960352422908
+      }
+    },
+    {
+      "epoch": 22,
+      "train_loss": 0.0005566478967321436,
+      "val_balanced_acc": 0.9996666666666667,
+      "val_acc": {
+        "vocal": 0.9993333333333333,
+        "violin": 0.9993333333333333,
+        "mridangam": 1.0,
+        "ghatam": 1.0
+      }
+    },
+    {
+      "epoch": 23,
+      "train_loss": 0.00039068922070354615,
+      "val_balanced_acc": 0.9993913362701909,
+      "val_acc": {
+        "vocal": 0.9993333333333333,
+        "violin": 0.9993333333333333,
+        "mridangam": 1.0,
+        "ghatam": 0.998898678414097
+      }
+    },
+    {
+      "epoch": 24,
+      "train_loss": 0.00037975017943448825,
+      "val_balanced_acc": 0.9991160058737152,
+      "val_acc": {
+        "vocal": 0.9993333333333333,
+        "violin": 0.9993333333333333,
+        "mridangam": 1.0,
+        "ghatam": 0.9977973568281938
+      }
+    },
+    {
+      "epoch": 25,
+      "train_loss": 0.00034485316111043283,
+      "val_balanced_acc": 0.9998333333333334,
+      "val_acc": {
+        "vocal": 0.9993333333333333,
+        "violin": 1.0,
+        "mridangam": 1.0,
+        "ghatam": 1.0
+      }
+    },
+    {
+      "epoch": 26,
+      "train_loss": 0.00034267852163995927,
+      "val_balanced_acc": 0.9992246696035243,
+      "val_acc": {
+        "vocal": 0.9993333333333333,
+        "violin": 0.9986666666666667,
+        "mridangam": 1.0,
+        "ghatam": 0.998898678414097
+      }
+    },
+    {
+      "epoch": 27,
+      "train_loss": 0.0004106905914916407,
+      "val_balanced_acc": 0.9995,
+      "val_acc": {
+        "vocal": 0.9993333333333333,
+        "violin": 0.9986666666666667,
+        "mridangam": 1.0,
+        "ghatam": 1.0
+      }
+    },
+    {
+      "epoch": 28,
+      "train_loss": 0.00033012928975382317,
+      "val_balanced_acc": 0.9993913362701909,
+      "val_acc": {
+        "vocal": 0.9993333333333333,
+        "violin": 0.9993333333333333,
+        "mridangam": 1.0,
+        "ghatam": 0.998898678414097
+      }
+    },
+    {
+      "epoch": 29,
+      "train_loss": 0.00038741770132015455,
+      "val_balanced_acc": 0.9993913362701909,
+      "val_acc": {
+        "vocal": 0.9993333333333333,
+        "violin": 0.9993333333333333,
+        "mridangam": 1.0,
+        "ghatam": 0.998898678414097
+      }
+    },
+    {
+      "epoch": 30,
+      "train_loss": 0.0003574242497860142,
+      "val_balanced_acc": 0.9989493392070485,
+      "val_acc": {
+        "vocal": 0.9993333333333333,
+        "violin": 0.9986666666666667,
+        "mridangam": 1.0,
+        "ghatam": 0.9977973568281938
+      }
+    }
+  ],
+  "classes": [
+    "vocal",
+    "violin",
+    "mridangam",
+    "ghatam"
+  ],
+  "train_tracks": [
+    "Concert01_01-Vanajakshi-Varnam",
+    "Concert01_02-Naada-Sudha",
+    "Concert01_03-Emi-Jesithe",
+    "Concert01_04-Yevaruvu-Ninnuvina",
+    "Concert01_05-Mariveredi",
+    "Concert01_07-Ada-Modi-Galade",
+    "Concert02_01-Shree-Venkate-Girisham",
+    "Concert02_02-Venkataramana",
+    "Concert02_03-Cittam-Irangadadenaiyya",
+    "Concert02_05-Unnai-Noki-Naan",
+    "Concert04_01-Veeriboni-Varnam",
+    "Concert04_01-Veeriboni-Varnam-(Take-1)",
+    "Concert04_02-Mahaganapathe",
+    "Concert04_03-Nannu-Brova",
+    "Concert04_04-Durithagaja-Panchanana",
+    "Concert04_06-Balagopala",
+    "Concert04_07-Yenage-Bhoga-Bhagya-Beda",
+    "Concert04_08-Tillana",
+    "Concert04_09-Mangalam",
+    "Concert05_01-Saami-Ninne",
+    "Concert05_01-Saami-Ninne-(Take-1)",
+    "Concert05_02-Manasa-Yetulortune",
+    "Concert05_04-Ranga-Naayakam",
+    "Concert05_05-Kripayapalaya",
+    "Concert05_06-Devki-Nandana",
+    "Concert05_07-Muruganai-Bajimaname",
+    "Concert05_08-Tillana"
+  ],
+  "val_tracks": [
+    "Concert01_06-Raama-Nee-Samanamevaru",
+    "Concert02_04-Nadopasana",
+    "Concert04_05-Kamalaptakula",
+    "Concert05_03-Durmargacharadhamulanu"
+  ],
+  "test_tracks": [
+    "Concert03_01-Vanajakshi-Varnam",
+    "Concert03_02-Sharanam-Bhavan",
+    "Concert03_03-Shambo-Sathatham",
+    "Concert03_04-Baaraiya-Ranga",
+    "Concert03_05-Ramanatham-Bhajeham",
+    "Concert03_06-Venkatachala-Nilayam"
+  ]
+}
