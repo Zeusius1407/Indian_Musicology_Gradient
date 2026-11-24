@@ -13,12 +13,12 @@ that measures how much cross-instrument bleed actually survived.
 
 ## Status
 
-| Milestone | Component | State |
+| Milestone | Component | 
 |---|---|---|
-| 1 | STFT front end, HPSS, tonic normalization, SDR metrics | **done** |
-| 2 | HTDemucs / U-Net fine-tuning on Sanidha, mask prediction | **done** — needs a GPU run on real data |
-| 3 | ISTFT / Griffin-Lim / vocoder resynthesis | **done**: all three in `infer/`, compared on held-out Concert03 (vocoder run pending) |
-| 4 | MFCC + 2-D CNN instrument classifier | **done**: trained on IMIDataset + Sanidha (13 classes); separated stems 94.8% balanced accuracy vs 95.7% clean, 22.3% raw mix |
+| 1 | STFT front end, HPSS, tonic normalization, SDR metrics |
+| 2 | HTDemucs / U-Net fine-tuning on Sanidha, mask prediction | 
+| 3 | ISTFT / Griffin-Lim / vocoder resynthesis |
+| 4 | MFCC + 2-D CNN instrument classifier | 
 
 ## Install
 
@@ -115,103 +115,6 @@ result.harmonic     # melodic magnitude spectrogram
 result.percussive   # transient magnitude spectrogram
 result.phase        # mixture phase, kept for resynthesis
 ```
-
-## Design decisions worth knowing
-
-**One STFT config, threaded everywhere.** `STFTConfig` is passed to analysis,
-masking and synthesis alike. Analysis/synthesis window mismatch is the single most
-common cause of "the model trained fine but the audio sounds wrong".
-
-**The complex spectrogram is kept, not just magnitude.** Milestone 3 inverts
-predicted magnitudes using the *mixture* phase; discarding phase at the front end
-makes that impossible.
-
-**HPSS is hand-written, not `librosa.decompose.hpss`.** Milestone 1 asks for the
-filter, and the kernel sizes need domain tuning: a mridangam stroke is much
-shorter than a Western kick, and a gamaka-laden violin line is much less
-horizontal than a Western sustained note. Kernels are specified in milliseconds
-and Hz, then converted to frames and bins, so they stay physically meaningful when
-the sample rate changes.
-
-**HPSS emits a residual.** With `margin > 1`, bins that are neither clearly
-harmonic nor clearly percussive go to a third output. Ghatam strokes and veena
-plucks land there; dumping them into the harmonic stem is what makes naive HPSS
-sound wrong on this repertoire.
-
-**Tonic normalization is explicit.** Indian art music has no fixed reference pitch;
-each performance picks its own Sa. Unnormalized, the network learns the same
-phrase separately at a dozen absolute pitches and the classifier partly learns the
-tonic instead of the timbre. `dsp/tonic.py` estimates it from a folded pitch
-histogram (the drone makes Sa the modal pitch class) and either shifts or records
-it. Swap in compIAM's tonic identification for real runs.
-
-**Silent windows are dropped before classification.** A separated stem is mostly
-silence wherever its instrument is not playing. Feed those windows to the
-classifier and it scores well by learning "silence ⇒ whichever stem is usually
-quiet" — which would invalidate the entire Milestone 4 bleed argument.
-
-**Splits are by recording, never by window.** Adjacent windows from one take share
-room, microphone and instrument. A random window split leaks and inflates accuracy
-substantially.
-
-**SIR and SAR are reported alongside SDR.** An aggressive mask raises SIR (less
-mridangam in the violin) while lowering SAR (more musical noise); the two can
-cancel to an unchanged SDR while sounding clearly worse.
-
-## Remaining work
-
-**Milestone 2** — implemented; what remains is the real training run and the
-Saraga number. How it is built:
-
-* *Backbone.* HTDemucs rather than Spleeter (PyTorch-native and maintained;
-  Spleeter is TF1-era). Its `drums/bass/other/vocals` output head is rebuilt for
-  `vocal/violin/mridangam/ghatam`, each new source starting from the closest
-  Western one (`vocal←vocals`, `violin←other`, `mridangam`/`ghatam←drums`), so
-  training starts from a model that already splits voice, melody and percussion.
-* *Parameter-efficient schedule.* Phase 1 (`frozen_encoder_epochs`) trains only
-  that head; phase 2 unfreezes the decoders and transformer at a 10× lower rate.
-  Both encoders stay frozen throughout.
-* *Simulated bleed.* Each source is convolved with a random short room response
-  and leaked into the other microphones at −30 to −12 dB, and every leaked copy is
-  labelled as the instrument that made it. That teaches the masks to follow the
-  instrument, not the microphone — the bridge from studio Sanidha to live Saraga.
-* *Other augmentation.* Per-stem gain, one shared pitch shift (the ensemble stays
-  in tune with itself), and stems shuffled across tracks.
-* *Selection.* `best.pt` is chosen by mean validation SDR, never loss, with SDR
-  logged per stem. Validation holds out whole *concerts* (`train.val_concerts`), never
-  tracks or segments: songs from one concert share performers, room and mics,
-  and alternate takes are near-duplicates, so anything finer leaks.
-* *Tonic.* Training does not pitch-normalize whole tracks; the ±2 semitone shift
-  augmentation covers tonic variation instead, and separation runs on raw audio.
-* *Still to do:* the training run, then evaluate `best.pt` on Saraga. `data/saraga.py`
-  is in place: 168 live multitracks, mridangam summed from its two close mics, ghatam
-  on only 46 of them (so quote the three-stem mean over all 168 and the four-stem mean
-  over the 46 separately, never one mean over both). Its `mixture` argument is a real
-  choice, not a default to ignore — the released master is separately engineered and is
-  *not* the sum of the close mics, which BSS-Eval assumes; `mixture="stems"` remixes the
-  mics linearly, keeping every bit of the live bleed while satisfying that assumption,
-  and `mixture="mixdown"` scores the master listeners actually hear. Report both.
-
-**Milestone 3** — implemented in `infer/`: mixture-phase ISTFT (the baseline),
-fast Griffin-Lim (random or mixture-phase init) and a pretrained BigVGAN vocoder
-(HiFi-GAN generator, trained on music as well as speech, at the pipeline's own
-44.1 kHz / hop-512 grid). Results are in
-`deliverables/milestone_3_resynthesis/`. *Still to do:* the vocoder run, then
-listening tests. Vocoders often score *worse* on SDR while sounding better, so
-judge them on `mag_snr` and by ear.
-
-**Milestone 4** — implemented in `classify/`: MFCC (+ deltas) windows into a
-~100k-parameter 2-D CNN over 13 classes, IMIDataset's ten plus Sanidha's vocal,
-mridangam and ghatam, split by recording (IMIDataset by block of consecutive clips,
-which are excerpts of longer recordings). 97.6% balanced accuracy on held-out
-IMIDataset clips. On held-out Concert03 the same windows are classified as
-ground-truth stem, separated stem, a −12 dB simulated-bleed control, and raw
-mixture: 95.7% / 94.8% / 52.1% / 22.3% balanced accuracy. The control
-shows the classifier does detect bleed, so separated stems scoring near clean ones
-means little bleed is left. Report: `deliverables/milestone_4_classifier/`.
-*Still to do:* the same test on Saraga's live close mics, which needs a window
-rule that does not rely on a clean reference.
-
 ## Layout
 
 ```
