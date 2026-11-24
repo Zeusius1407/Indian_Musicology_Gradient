@@ -14,7 +14,7 @@ that measures how much cross-instrument bleed actually survived.
 ## Status
 
 | Milestone | Component | 
-|---|---|---|
+|---|---|
 | 1 | STFT front end, HPSS, tonic normalization, SDR metrics |
 | 2 | HTDemucs / U-Net fine-tuning on Sanidha, mask prediction | 
 | 3 | ISTFT / Griffin-Lim / vocoder resynthesis |
