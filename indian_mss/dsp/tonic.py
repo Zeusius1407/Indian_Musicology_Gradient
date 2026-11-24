@@ -48,9 +48,13 @@ def estimate_tonic(audio: np.ndarray, sample_rate: int, fmin: float = 100.0, fma
     tonic is the most-occupied pitch class by a wide margin.
 
     This is a dependency-light stand-in for compIAM's dedicated tonic
-    identification models (``compiam.melody.tonic_identification``). Prefer
-    those on real data -- they were trained for exactly this task and handle
-    the Sa/Pa ambiguity better. Swap the call here and nothing else changes.
+    identification models (``compiam.melody.tonic_identification``), which
+    were trained for exactly this task and handle the Sa/Pa ambiguity better.
+    They are not used because compIAM 0.4.1 pins ``numpy<=1.26.4``,
+    ``scikit-image~=0.24`` and ``torch==2.0.0``, none of which install next to
+    this project's Python 3.14 / torch 2.11. Accuracy on Saraga's annotated
+    tonics is in ``deliverables/milestone_1_preprocessing/README.md``. If
+    compIAM becomes installable, swap the call here and nothing else changes.
 
     Returns
     -------

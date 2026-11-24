@@ -27,7 +27,7 @@ add back to the mixture sample for sample. Compare by ear with
 | `griffin_lim` | mask × \|mixture\|, phase rebuilt from random init (fast Griffin-Lim, 32 iters) |
 | `griffin_lim_mixinit` | the same, Griffin-Lim started from the mixture phase |
 | `oracle_mixture_phase` | ideal ratio mask from the references × mixture STFT: the ceiling for mixture-phase masking |
-| `vocoder` | mask × \|mixture\| → mel → BigVGAN: built, **not run yet** (see below) |
+| `vocoder` | mask × \|mixture\| → 128-band mel → pretrained BigVGAN v2 (see below) |
 
 `mag_snr` is a phase-blind spectral match (`eval.sdr.magnitude_snr`): it
 compares STFT magnitudes only, so it is the fair column for methods that make
@@ -43,6 +43,7 @@ Concert03 was held out from training. Mean over stems:
 | **mixture_phase** | **8.08** | 18.92 | 8.80 | 8.09 | 10.78 |
 | griffin_lim | −30.81 | (15.44) | −28.10 | −30.81 | 10.68 |
 | griffin_lim_mixinit | 6.46 | 21.68 | 6.72 | 6.46 | 10.88 |
+| vocoder | −33.33 | (12.27) | −30.49 | −33.42 | 8.76 |
 | oracle_mixture_phase | 9.90 | 18.57 | 10.80 | 9.90 | 13.20 |
 
 Per stem (SDR / mag_snr, dB):
@@ -53,6 +54,7 @@ Per stem (SDR / mag_snr, dB):
 | mixture_phase | 7.98 / 11.57 | 6.07 / 8.79 | 11.09 / 13.56 | 7.21 / 9.21 |
 | griffin_lim | −36.48 / 11.52 | −29.94 / 8.76 | −29.98 / 13.48 | −26.86 / 8.94 |
 | griffin_lim_mixinit | 5.60 / 11.74 | 3.26 / 8.86 | 10.07 / 13.68 | 6.93 / 9.23 |
+| vocoder | −32.83 / 9.18 | −40.89 / 7.85 | −27.65 / 10.90 | −31.97 / 7.11 |
 | oracle_mixture_phase | 9.38 / 12.89 | 7.67 / 11.10 | 12.39 / 15.66 | 10.17 / 13.14 |
 
 The `direct` row reproduces the checkpoint's recorded validation SDR (8.89 dB),
@@ -68,6 +70,7 @@ every method, the mixture and the references.
 | mixture_phase | 7.41 | 10.18 |
 | griffin_lim | −27.83 | 9.68 |
 | griffin_lim_mixinit | 6.18 | 10.27 |
+| vocoder | −27.13 | 8.46 |
 | oracle_mixture_phase | 9.47 | 12.50 |
 
 `sample/clips/sample/<method>/` holds full-length stems for every method.
@@ -97,11 +100,18 @@ every method, the mixture and the references.
   (−1.6 dB SDR, mostly violin −2.8), for only +0.1 dB mag_snr. Making the
   phase self-consistent pulls it away from the true sources' phase.
   `mixture_phase` stays the default.
+* **The vocoder is the worst method here, even on the phase-blind metric.**
+  Its mag_snr is 8.76 dB, 2.0 dB below mixture-phase ISTFT (vocal −2.4,
+  violin −0.9, mridangam −2.7, ghatam −2.1) and 1.9 dB below Griffin-Lim from
+  random phase. Griffin-Lim keeps the masked magnitude, but the vocoder has to
+  regenerate it from a 128-band mel, and it adds its own spectral error on top
+  of the mask's. Its SDR (−33 dB) fails for the same phase reason as
+  Griffin-Lim's, and its bracketed SIR is equally meaningless.
 
 These are SDRs on Sanidha, where the mixture is the plain sum of near-zero-bleed
 close mics. Live Saraga audio will score lower for every method.
 
-## Vocoder: built, not yet run
+## Vocoder
 
 `indian_mss/infer/vocoder.py` wraps NVIDIA's pretrained
 **BigVGAN v2** (`nvidia/bigvgan_v2_44khz_128band_512x`). BigVGAN is a HiFi-GAN
@@ -112,7 +122,10 @@ shift. Public HiFi-GAN checkpoints are 22 kHz speech models, which is why
 BigVGAN is used here.
 
 Its model code ships inside the Hugging Face repo, so running it executes
-downloaded Python. That step has not been run here. To run it:
+downloaded Python (snapshot `95a9d1dc`, 122 M parameters, no fine-tuning).
+The wrapper builds the generator itself rather than calling
+`BigVGAN.from_pretrained`, which fails under huggingface_hub ≥ 1.0. It loads
+the weights with `weights_only=True`. To rerun:
 
 ```bash
 pip install -e ".[vocoder]"
@@ -120,5 +133,27 @@ python scripts/compare_resynthesis.py --checkpoint deliverables/milestone_2_mode
     --sanidha-root data/sanidha_flat --outdir deliverables/milestone_3_resynthesis/heldout
 ```
 
-Expect the vocoder to score low on SDR, for the same reason as Griffin-Lim.
-Judge it on `mag_snr` and by ear against the `mixture_phase` clips.
+Listening clips are in `heldout/clips/*/vocoder/` and `sample/clips/sample/vocoder/`.
+
+**Copy-synthesis check.** To separate the vocoder's own error from the
+mask's, each clean reference stem of `../sample/` (first 10 s) was vocoded
+with an all-ones mask:
+
+| | vocal | violin | mridangam | ghatam |
+|---|---|---|---|---|
+| mag_snr (dB) | 15.06 | 14.20 | 14.17 | 11.50 |
+| RMS out / in | 0.97 | 0.95 | 0.95 | 0.99 |
+
+Level is preserved and the frame alignment is right. Even from a perfect
+spectrogram, though, BigVGAN's output matches the input spectrum only to
+11.5–15 dB, so it imposes its own ceiling on mag_snr. ISTFT of the same
+input would match exactly. Its weakest stem is the ghatam, whose
+noise-like strokes are furthest from BigVGAN's training material.
+
+**What it means.** An off-the-shelf vocoder adds error rather than removing
+it at this stage. It sees masked mels with spectral holes, which are unlike
+its training input, and it is never fine-tuned on Carnatic audio. Its one
+potential advantage over mask × mixture phase is regenerating a clean
+spectrum where the mask left musical noise, and that can only be judged by
+ear. No listening test has been done yet. A vocoder fine-tuned on Sanidha's
+masked estimates is the change that could make it competitive.

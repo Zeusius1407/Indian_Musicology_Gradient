@@ -57,6 +57,30 @@ def _import_bigvgan(repo: str):
     return module, path
 
 
+def _load_generator(module, path: str):
+    """Build the generator from a downloaded snapshot, weight norm removed.
+
+    Does by hand what ``BigVGAN.from_pretrained`` does. That method is a
+    ``PyTorchModelHubMixin`` hook whose signature requires ``proxies`` and
+    ``resume_download``, keywords huggingface_hub 1.x stopped passing, so it
+    raises a ``TypeError`` on current installs. ``weights_only=True`` keeps the
+    checkpoint load from unpickling arbitrary objects.
+    """
+    from pathlib import Path
+
+    h = module.load_hparams_from_json(str(Path(path) / "config.json"))
+    model = module.BigVGAN(h, use_cuda_kernel=False)
+    state = torch.load(Path(path) / "bigvgan_generator.pt", map_location="cpu", weights_only=True)["generator"]
+    try:
+        model.load_state_dict(state)
+        model.remove_weight_norm()
+    except RuntimeError:
+        # Some releases ship the generator with weight norm already folded in.
+        model.remove_weight_norm()
+        model.load_state_dict(state)
+    return model
+
+
 class Vocoder:
     """Masks + mixture in, one waveform per source out.
 
@@ -83,9 +107,8 @@ class Vocoder:
     ):
         module, path = _import_bigvgan(repo)
         self.device = torch.device(device or ("cuda" if torch.cuda.is_available() else "cpu"))
-        model = module.BigVGAN.from_pretrained(path, use_cuda_kernel=False)
-        model.remove_weight_norm()
-        self.model = model.eval().to(self.device)
+        self.model = _load_generator(module, path).eval().to(self.device)
+        model = self.model
         self.h = model.h
         self.chunk_frames = chunk_frames
         self.context_frames = context_frames

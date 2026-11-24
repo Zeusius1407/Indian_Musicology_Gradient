@@ -169,3 +169,64 @@ def test_train_with_imi_adds_its_classes(corpus, tmp_path):
     probs = classify_clips(model, meta, meta["imi_test_clips"], "cpu")
     summary = summarize({"imi_test": probs}, meta["classes"], sorted(probs), ("imi_test",))["imi_test"]
     assert np.asarray(summary["confusion"]).shape == (len(probs), 7)
+
+
+def _bled_mics(rng, seconds: float = 8.0, leak_db: float = -12.0):
+    """Two live mics: ``drum`` plays only in the first half, ``voice`` throughout,
+    and each leaks into the other's mic at ``leak_db``."""
+    n = int(seconds * SR)
+    t = np.arange(n) / SR
+    voice = 0.3 * np.sin(2 * np.pi * 440.0 * t) * (1 + 0.2 * rng.standard_normal(n))
+    drum = np.zeros(n)
+    drum[: n // 2] = 0.5 * rng.standard_normal(n // 2)
+    g = 10 ** (leak_db / 20)
+    return {"voice": (voice + g * drum).astype(np.float32), "drum": (drum + g * voice).astype(np.float32)}
+
+
+def test_live_rule_rejects_bleed_only_windows():
+    from indian_mss.classify.live import LiveWindowConfig, live_active_starts
+
+    cfg = WindowConfig(window_seconds=0.5, hop_seconds=0.25)
+    rng = np.random.default_rng(0)
+    mics = _bled_mics(rng)
+    # The bled drum mic is loud enough to pass the silence floors everywhere...
+    assert len(active_starts(mics["drum"], SR, cfg)) > 0.9 * len(active_starts(mics["voice"], SR, cfg))
+    # ...but the bleed-floor rule keeps only the half where the drum plays.
+    (starts,), floors = live_active_starts([mics], SR, cfg, LiveWindowConfig(floor_percentile=5, margin_db=6))
+    half = 4.0 * SR
+    win = int(cfg.window_seconds * SR)
+    assert len(starts["drum"]) > 0 and np.all(starts["drum"] + win <= half + win // 2)
+    # The voice plays throughout; a window counts while the drum is silent.
+    assert np.any(starts["voice"] >= half)
+    assert set(floors) == {"voice", "drum"}
+
+
+def test_live_rule_pools_the_floor_over_a_concert():
+    from indian_mss.classify.live import LiveWindowConfig, live_active_starts
+
+    cfg = WindowConfig(window_seconds=0.5, hop_seconds=0.25)
+    rng = np.random.default_rng(1)
+    rests = _bled_mics(rng)
+    n = len(rests["drum"])
+    # A second track where the drum never stops: on its own, its floor would
+    # sit on the playing level and reject it everywhere.
+    busy = {"voice": rests["voice"], "drum": np.concatenate([rests["drum"][: n // 2]] * 2)}
+    alone, _ = live_active_starts([busy], SR, cfg, LiveWindowConfig(margin_db=6))
+    pooled, _ = live_active_starts([rests, busy], SR, cfg, LiveWindowConfig(margin_db=6))
+    assert len(pooled[1]["drum"]) > 2 * len(alone[0]["drum"])
+
+
+def test_report_renders_custom_conditions(tmp_path):
+    pytest.importorskip("matplotlib")
+    import matplotlib
+
+    matplotlib.use("Agg")
+    from indian_mss.classify.report import write_report
+
+    rng = np.random.default_rng(0)
+    conds = ("close_mic", "separated", "separated_master", "mixture")
+    probs = {c: {k: [rng.dirichlet(np.ones(4), size=10)] for k in CLASSES} for c in conds}
+    result = {"classes": CLASSES, "labels": CLASSES, "conditions": list(conds), "title": "t",
+              "summary": summarize(probs, CLASSES, CLASSES, conds)}  # fmt: skip
+    write_report(result, tmp_path / "s.pdf")
+    assert (tmp_path / "s.pdf").stat().st_size > 0 and (tmp_path / "s.png").is_file()

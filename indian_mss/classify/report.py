@@ -26,6 +26,8 @@ _TITLES = {
     "separated": "Separated stems",
     "bleed_12db": "Control: stem + others at -12 dB",
     "mixture": "Raw mixture",
+    "close_mic": "Live close mic (its own bleed)",
+    "separated_master": "Separated from the released master",
 }
 
 
@@ -62,14 +64,18 @@ def write_report(result: dict, path: str | Path) -> None:
     rows = result["classes"]
     labels = result.get("labels", rows)
     summary = result["summary"]
+    conditions = list(result.get("conditions", CONDITIONS))
     with PdfPages(path) as pdf:
-        fig, axes = plt.subplots(2, 2, figsize=(14, 7.5), constrained_layout=True)
-        for ax, cond in zip(axes.flat, CONDITIONS):
-            plot_confusion(ax, summary[cond], rows, labels, _TITLES[cond])
+        fig, axes = plt.subplots(2, (len(conditions) + 1) // 2, figsize=(14, 7.5), constrained_layout=True, squeeze=False)
+        for ax, cond in zip(axes.flat, conditions):
+            plot_confusion(ax, summary[cond], rows, labels, _TITLES.get(cond, cond))
+        for ax in list(axes.flat)[len(conditions):]:
+            ax.axis("off")
         for ax in axes[:, 0]:
             ax.set_ylabel("instrument actually playing", color=_INK_MUTED, fontsize=9)
         fig.suptitle(
-            f"Timbre classifier on held-out {', '.join(result['test_concerts'])}: windows where each "
+            result.get("title")
+            or f"Timbre classifier on held-out {', '.join(result['test_concerts'])}: windows where each "
             f"instrument is playing (separator resynthesis: {result['resynthesis_method']})",
             color=_INK,
         )
@@ -89,21 +95,21 @@ def write_report(result: dict, path: str | Path) -> None:
 
         fig, ax = plt.subplots(figsize=(14, 4.5))
         ax.axis("off")
-        header = ["instrument", "windows"] + [f"{c} acc." for c in CONDITIONS] + [f"{c} bleed" for c in CONDITIONS]
+        header = ["instrument", "windows"] + [f"{c} acc." for c in conditions] + [f"{c} bleed" for c in conditions]
         table_rows = []
         for cls in rows:
-            ref = summary["reference"]["per_class"].get(cls)
+            ref = summary[conditions[0]]["per_class"].get(cls)
             if not ref:
                 continue
             table_rows.append(
                 [cls, str(ref["n_windows"])]
-                + [f"{summary[c]['per_class'][cls]['accuracy']:.1%}" for c in CONDITIONS]
-                + [f"{summary[c]['per_class'][cls]['bleed_mass']:.2f}" for c in CONDITIONS]
+                + [f"{summary[c]['per_class'][cls]['accuracy']:.1%}" for c in conditions]
+                + [f"{summary[c]['per_class'][cls]['bleed_mass']:.2f}" for c in conditions]
             )
         table_rows.append(
             ["balanced", ""]
-            + [f"{summary[c]['balanced_accuracy']:.1%}" for c in CONDITIONS]
-            + [f"{summary[c]['mean_bleed_mass']:.2f}" for c in CONDITIONS]
+            + [f"{summary[c]['balanced_accuracy']:.1%}" for c in conditions]
+            + [f"{summary[c]['mean_bleed_mass']:.2f}" for c in conditions]
         )
         table = ax.table(cellText=table_rows, colLabels=header, loc="upper center", cellLoc="center")
         table.auto_set_font_size(False)

@@ -1,14 +1,23 @@
 #!/usr/bin/env python3
-"""Regenerate every figure in ``reports/figures/`` for the progress presentation.
+"""Regenerate the figures in ``reports/figures/``.
 
-Everything here runs on SYNTHETIC audio -- Sanidha access is still pending --
-and every figure says so. The synthetic ensemble is built to be Carnatic-like
-rather than a toy: a voice singing a raga phrase with gamaka oscillations, a
-violin shadowing it a beat behind, a tanpura-style drone, tuned mridangam
-strokes and ghatam slaps.
+Milestone 1 figures run on REAL audio, with the pipeline's own STFT and HPSS
+settings from ``configs/default.yaml``:
 
-    python reports/make_figures.py              # ~15 min on a laptop CPU
-    python reports/make_figures.py --m2-only    # only the training figures
+* ``m1_hpss_spectrograms.png``: the 30 s deliverable clip (Concert03, never
+  trained on), first 10 s: mix, melodic and percussive spectrograms.
+* ``m1_kernel_sweep.png``: HPSS SDR over time and frequency kernel sizes, on
+  all six Concert03 tracks scored against their ground-truth stems.
+* ``m1_tonic_saraga.png``: ``dsp.tonic.estimate_tonic`` against the
+  annotated tonic of every Saraga Carnatic recording that has one.
+
+``--m2-synthetic`` additionally runs the old synthetic-audio training demo
+(a toy Carnatic-like ensemble trained at 8 kHz). Its figures predate access to
+Sanidha. The real training curves are in
+``deliverables/milestone_2_model/training_report.pdf``.
+
+    python reports/make_figures.py                  # ~20 min, needs data/sanidha_flat and data/saraga
+    python reports/make_figures.py --m2-synthetic   # also the synthetic training demo
 
 Writes PNGs plus ``reports/figures/numbers.json`` with every figure's numbers.
 """
@@ -158,38 +167,99 @@ def spec_panel(ax, mag: np.ndarray, cfg: STFTConfig, ref: float, title: str, fma
     ax.set_xlabel("time (s)")
 
 
-def fig_hpss(numbers: dict) -> None:
-    stems = ensemble(8.0, 146.83, seed=1)
-    mix = sum(stems.values())
-    cfg = STFTConfig(sample_rate=SR, n_fft=1024, hop_length=256)
-    hcfg = HPSSConfig(harmonic_ms=200, percussive_hz=500)
-    res = hpss_spectrograms(mix, cfg, hcfg)
-    peak = float((res.harmonic + res.percussive).max())
+# --- Milestone 1 figures: real audio -----------------------------------------
+#
+# The spectrograms use the 30 s deliverable clip (Concert03, held out from
+# training); the kernel sweep scores HPSS on all six Concert03 tracks against
+# their ground-truth stems; the tonic figure scores ``estimate_tonic`` on every
+# Saraga Carnatic recording with an annotated tonic. STFT and HPSS settings
+# come from configs/default.yaml, the same ones the pipeline uses.
 
+SANIDHA = ROOT / "data" / "sanidha_flat"
+SARAGA = ROOT / "data" / "saraga" / "saraga1.5_carnatic"
+SAMPLE = ROOT / "deliverables" / "sample"
+SWEEP_SECONDS = 30.0
+TONIC_SECONDS = 30.0
+TONIC_SR = 22050
+MELODIC, PERCUSSIVE = ("vocal", "violin"), ("mridangam", "ghatam")
+
+
+def _pipeline_configs():
+    from indian_mss.config import load_config
+
+    cfg = load_config(ROOT / "configs" / "default.yaml")
+    s, h = cfg["stft"], cfg["hpss"]
+    stft_cfg = STFTConfig(sample_rate=s["sample_rate"], n_fft=s["n_fft"], hop_length=s["hop_length"])
+    hpss_cfg = HPSSConfig(harmonic_ms=h["harmonic_ms"], percussive_hz=h["percussive_hz"], power=h["power"], margin=h["margin"])
+    return stft_cfg, hpss_cfg
+
+
+def _refs(stems: dict[str, np.ndarray]) -> dict[str, np.ndarray]:
+    n = len(next(iter(stems.values())))
+    pick = lambda names: np.sum([stems[k] for k in names if k in stems] or [np.zeros(n)], axis=0)  # noqa: E731
+    return {"harmonic": pick(MELODIC), "percussive": pick(PERCUSSIVE)}
+
+
+def _sweep_one(job):
+    mix, refs, stft_cfg, h, p = job
+    e = hpss_audio(mix, stft_cfg, HPSSConfig(harmonic_ms=h, percussive_hz=p))
+    s = evaluate_stems({k: e[k] for k in refs}, refs)
+    return h, p, s["harmonic"]["sdr"], s["percussive"]["sdr"]
+
+
+def fig_hpss(numbers: dict) -> None:
+    from multiprocessing import Pool
+
+    from indian_mss.cli.evaluate import _crop_centre
+    from indian_mss.data.base import load_audio
+    from indian_mss.data.sanidha import Sanidha
+
+    stft_cfg, hpss_cfg = _pipeline_configs()
+    sr = stft_cfg.sample_rate
+
+    # Spectrograms: the first 10 s of the deliverable clip, legible at slide size.
+    mix = load_audio(SAMPLE / "sample_mix.wav", sr)
+    stems = {k: load_audio(SAMPLE / f"reference_{k}.wav", sr) for k in MELODIC + PERCUSSIVE}
+    shown = mix[: 10 * sr]
+    res = hpss_spectrograms(shown, stft_cfg, hpss_cfg)
+    peak = float((res.harmonic + res.percussive + res.residual).max())
     fig, axes = plt.subplots(1, 3, figsize=(16, 6.2), sharey=True)
-    spec_panel(axes[0], res.harmonic + res.percussive + res.residual, cfg, peak, "Input mix")
-    spec_panel(axes[1], res.harmonic, cfg, peak, "Melodic spectrogram")
-    spec_panel(axes[2], res.percussive, cfg, peak, "Percussive spectrogram")
+    spec_panel(axes[0], res.harmonic + res.percussive + res.residual, stft_cfg, peak, "Input mix")
+    spec_panel(axes[1], res.harmonic, stft_cfg, peak, "Melodic spectrogram")
+    spec_panel(axes[2], res.percussive, stft_cfg, peak, "Percussive spectrogram")
     axes[0].set_ylabel("frequency (kHz)")
     fig.tight_layout()
     fig.savefig(OUT / "m1_hpss_spectrograms.png", dpi=200)
     plt.close(fig)
 
-    est = hpss_audio(mix, cfg, hcfg)
-    refs = {"harmonic": stems["vocal"] + stems["violin"], "percussive": stems["mridangam"] + stems["ghatam"]}
-    scores = evaluate_stems({k: est[k] for k in refs}, refs)
-    numbers["hpss_default"] = scores
+    est = hpss_audio(mix, stft_cfg, hpss_cfg)
+    refs = _refs(stems)
+    numbers["hpss_default_sample_clip"] = evaluate_stems({k: est[k] for k in refs}, refs)
 
-    # Kernel sweep: the domain-tuning result.
+    # Kernel sweep over Concert03 (the held-out concert), central 30 s per track.
+    corpus = Sanidha(SANIDHA, sr, stems=MELODIC + PERCUSSIVE)
+    tracks = [t for t in corpus.track_ids() if t.startswith("Concert03")]
     h_ms = [50, 100, 200, 400, 800]
     p_hz = [125, 250, 500, 1000, 2000]
-    grid = np.zeros((len(h_ms), len(p_hz)))
-    for i, h in enumerate(h_ms):
-        for j, p in enumerate(p_hz):
-            e = hpss_audio(mix, cfg, HPSSConfig(harmonic_ms=h, percussive_hz=p))
-            s = evaluate_stems({k: e[k] for k in refs}, refs)
-            grid[i, j] = np.mean([s["harmonic"]["sdr"], s["percussive"]["sdr"]])
-    numbers["kernel_sweep"] = {"harmonic_ms": h_ms, "percussive_hz": p_hz, "mean_sdr": grid.tolist()}
+    jobs = []
+    for tid in tracks:
+        m, st, _ = _crop_centre(corpus.load(tid), SWEEP_SECONDS)
+        r = _refs(st)
+        jobs += [(m.copy(), {k: v.copy() for k, v in r.items()}, stft_cfg, h, p) for h in h_ms for p in p_hz]
+    with Pool(6) as pool:
+        results = pool.map(_sweep_one, jobs)
+    harm = np.zeros((len(h_ms), len(p_hz)))
+    perc = np.zeros_like(harm)
+    for h, p, hs, ps in results:
+        i, j = h_ms.index(h), p_hz.index(p)
+        harm[i, j] += hs / len(tracks)
+        perc[i, j] += ps / len(tracks)
+    grid = (harm + perc) / 2
+    numbers["kernel_sweep"] = {
+        "data": f"Sanidha Concert03, {len(tracks)} tracks, central {SWEEP_SECONDS:g} s",
+        "harmonic_ms": h_ms, "percussive_hz": p_hz,
+        "mean_sdr": grid.tolist(), "harmonic_sdr": harm.tolist(), "percussive_sdr": perc.tolist(),
+    }  # fmt: skip
 
     fig, ax = plt.subplots(figsize=(10, 7))
     im = ax.imshow(grid, cmap="cividis", origin="lower", aspect="auto")
@@ -202,60 +272,96 @@ def fig_hpss(numbers: dict) -> None:
         for j in range(len(p_hz)):
             light = grid[i, j] > grid.min() + 0.6 * (grid.max() - grid.min())
             ax.text(j, i, f"{grid[i, j]:+.1f}", ha="center", va="center", fontsize=17,
-                    color=INK if light else PAPER, fontweight="bold" if (i, j) == best else "normal")
+                    color=INK if light else PAPER, fontweight="bold" if (i, j) == best else "normal")  # fmt: skip
     cb = fig.colorbar(im, ax=ax)
-    cb.set_label("mean SDR (dB)")
+    cb.set_label("mean SDR, melodic + percussive (dB)")
+    ax.set_title(f"HPSS on Concert03 ({len(tracks)} tracks)", loc="left")
     for s in ax.spines.values():
         s.set_visible(False)
     fig.tight_layout()
     fig.savefig(OUT / "m1_kernel_sweep.png", dpi=200)
     plt.close(fig)
     numbers["kernel_best"] = {"harmonic_ms": h_ms[best[0]], "percussive_hz": p_hz[best[1]], "mean_sdr": float(grid.max())}
+    d = (h_ms.index(int(hpss_cfg.harmonic_ms)), p_hz.index(int(hpss_cfg.percussive_hz)))
+    numbers["kernel_config_default"] = {"harmonic_ms": hpss_cfg.harmonic_ms, "percussive_hz": hpss_cfg.percussive_hz, "mean_sdr": float(grid[d])}
 
 
-def _fold_old(f0: np.ndarray, fmin: float, fmax: float) -> float:
-    """``estimate_tonic`` as first committed (a7015fa), octave step included."""
-    cents = 1200.0 * np.log2(f0 / fmin)
-    folded = np.mod(cents, 1200.0)
-    hist, edges = np.histogram(folded, bins=120, range=(0.0, 1200.0))
-    peak = 0.5 * (edges[hist.argmax()] + edges[hist.argmax() + 1])
-    candidate = fmin * 2 ** (peak / 1200.0)
-    while candidate < fmin:
-        candidate *= 2
-    while candidate > fmax:
-        candidate /= 2
-    return float(candidate)
+def _tonic_one(job):
+    import warnings
+
+    from indian_mss.data.base import audio_duration, load_segment
+    from indian_mss.dsp.tonic import estimate_tonic
+
+    audio_path, true_hz = job
+    warnings.filterwarnings("ignore")
+    dur = audio_duration(audio_path)
+    start = max(0.0, (dur - TONIC_SECONDS) / 2)
+    x = load_segment(audio_path, TONIC_SR, start, TONIC_SECONDS)
+    return str(audio_path), true_hz, float(estimate_tonic(x, TONIC_SR))
+
+
+def _tonic_jobs() -> list[tuple[Path, float]]:
+    jobs = []
+    for ann in sorted(SARAGA.rglob("*.ctonic.txt")):
+        if ann.name.startswith("._"):
+            continue
+        piece = ann.name[: -len(".ctonic.txt")]
+        audio = next((ann.with_name(piece + ext) for ext in (".mp3.mp3", ".mp3", ".wav") if ann.with_name(piece + ext).is_file()), None)
+        if audio is not None:
+            jobs.append((audio, float(ann.read_text().split()[0])))
+    return jobs
 
 
 def fig_tonic(numbers: dict) -> None:
-    import librosa
+    """``estimate_tonic`` against Saraga's annotated tonics (central 30 s of each released recording)."""
+    from multiprocessing import Pool
 
-    from indian_mss.dsp.tonic import estimate_tonic
+    with Pool(8) as pool:
+        rows = pool.map(_tonic_one, _tonic_jobs())
+    true = np.array([t for _, t, _ in rows])
+    est = np.array([e for *_, e in rows])
+    cents = 1200 * np.log2(est / true)
+    folded = (cents + 600) % 1200 - 600  # pitch-class error, octave ignored
 
-    true = np.geomspace(105, 380, 22)
-    old, new = [], []
-    for f in true:
-        t = np.arange(int(2.0 * SR)) / SR
-        drone = sum(0.5 / (k + 1) * np.sin(2 * np.pi * f * (k + 1) * t) for k in range(4))
-        f0, voiced, _ = librosa.pyin(drone.astype(np.float32), fmin=100.0, fmax=400.0, sr=SR)
-        f0 = f0[voiced & np.isfinite(f0)]
-        old.append(_fold_old(f0, 100.0, 400.0))
-        new.append(estimate_tonic(drone, SR))
-    numbers["tonic"] = {"true": true.tolist(), "old": old, "new": new}
+    def share(mask):
+        return float(np.mean(mask))
+
+    exact = np.abs(cents) <= 50
+    octave = ~exact & (np.abs(folded) <= 50)
+    # Folded to [-600, 600) cents, Pa taken for Sa (a fifth up, or a fourth
+    # down) lands at -500 whatever the octave; Ma taken for Sa at +500.
+    pa = ~exact & ~octave & (np.abs(folded + 500) <= 50)
+    ma = ~exact & ~octave & (np.abs(folded - 500) <= 50)
+    other = ~(exact | octave | pa | ma)
+    numbers["tonic_saraga"] = {
+        "data": f"Saraga Carnatic, {len(rows)} annotated recordings, central {TONIC_SECONDS:g} s of the released audio",
+        "n": len(rows),
+        "correct_within_50_cents": share(exact),
+        "octave_error": share(octave),
+        "pa_taken_for_sa": share(pa),
+        "ma_taken_for_sa": share(ma),
+        "other": share(other),
+        "median_abs_cents_when_correct": float(np.median(np.abs(cents[exact]))) if exact.any() else None,
+        "per_recording": [{"audio": a, "true_hz": t, "est_hz": e} for a, t, e in rows],
+    }
 
     fig, ax = plt.subplots(figsize=(12, 6.5))
-    ax.axvspan(200, 400, color="#E9E2D6", zorder=0)
-    ax.text(205, 375, "typical female\nvocal Sa range", va="top", fontsize=16, color=MUTED)
-    ax.plot(true, true, color=MUTED, lw=1.5, ls="--", label="correct")
-    ax.plot(true, old, "o-", color=ACCENT, lw=2.5, ms=8, label="before fix")
-    ax.plot(true, new, "s-", color=ACCENT2, lw=2.5, ms=7, label="after fix")
-    ax.set_xlabel("true tonic (Hz)")
+    lo, hi = 90, 420
+    ax.plot([lo, hi], [lo, hi], color=MUTED, lw=1.5, ls="--", label="correct")
+    for k, ls in ((2, ":"), (0.5, ":")):
+        ax.plot([lo, hi], [lo * k, hi * k], color=MUTED, lw=1, ls=ls)
+    ax.plot(true[exact], est[exact], "o", color=ACCENT2, ms=7, label=f"within 50 cents ({exact.mean():.0%})")
+    ax.plot(true[octave], est[octave], "s", color=ACCENT, ms=7, label=f"octave error ({octave.mean():.0%})")
+    rest = ~(exact | octave)
+    ax.plot(true[rest], est[rest], "x", color=INK, ms=8, mew=2, label=f"other ({rest.mean():.0%})")
+    ax.set_xlabel("annotated tonic (Hz)")
     ax.set_ylabel("estimated tonic (Hz)")
-    ax.set_xlim(100, 390)
-    ax.set_ylim(90, 400)
+    ax.set_xlim(lo, max(260.0, float(true.max()) * 1.05))
+    ax.set_ylim(lo, hi)
+    ax.set_title(f"Tonic estimation on Saraga Carnatic ({len(rows)} recordings)", loc="left")
     ax.legend(loc="upper left", frameon=False)
     fig.tight_layout()
-    fig.savefig(OUT / "m1_tonic_fix.png", dpi=200)
+    fig.savefig(OUT / "m1_tonic_saraga.png", dpi=200)
     plt.close(fig)
 
 
@@ -389,20 +495,21 @@ def fig_training(numbers: dict, workdir: Path) -> None:
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
-    work = Path(args[0]) if args else ROOT / "out" / "figure_work"
-    work.mkdir(parents=True, exist_ok=True)
     numbers_path = OUT / "numbers.json"
-    numbers: dict = json.loads(numbers_path.read_text()) if numbers_path.is_file() else {}
-    numbers["note"] = "all numbers are on synthetic audio; see reports/make_figures.py"
-    if "--m2-only" not in sys.argv:
-        fig_hpss(numbers)
-        print("milestone 1 figures done", flush=True)
-        fig_tonic(numbers)
-        print("tonic figure done", flush=True)
-        numbers_path.write_text(json.dumps(numbers, indent=2, default=float))
-    fig_training(numbers, work)
-    print("milestone 2 figures done")
+    numbers: dict = {"note": "Milestone 1 figures are on real audio; see reports/make_figures.py"}
+    fig_hpss(numbers)
+    print("HPSS figures done", flush=True)
+    fig_tonic(numbers)
+    print("tonic figure done", flush=True)
     numbers_path.write_text(json.dumps(numbers, indent=2, default=float))
+    if "--m2-synthetic" in sys.argv:
+        work = Path(args[0]) if args else ROOT / "out" / "figure_work"
+        work.mkdir(parents=True, exist_ok=True)
+        synthetic: dict = {"note": "synthetic audio"}
+        fig_training(synthetic, work)
+        numbers["m2_synthetic_demo"] = synthetic
+        numbers_path.write_text(json.dumps(numbers, indent=2, default=float))
+        print("synthetic milestone 2 figures done")
 
 
 if __name__ == "__main__":

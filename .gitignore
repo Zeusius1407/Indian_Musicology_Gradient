@@ -11,3 +11,4 @@ checkpoints/
 !tests/fixtures/*.wav
 *.log
 *.pt
+dist/

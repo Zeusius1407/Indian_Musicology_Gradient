@@ -8,11 +8,12 @@ for plus the evidence behind it. Every milestone is run on the same input: a
 |---|---|---|---|
 | 1 | Script returning a melodic and a percussive spectrogram array | `milestone_1_preprocessing/` | done |
 | 2 | Model save state predicting mask ratios for Indian instruments | `milestone_2_model/` | done |
-| 3 | Isolated `.wav` stems per instrument | `milestone_3_resynthesis/` | done: mixture-phase ISTFT stems, compared with Griffin-Lim on held-out Concert03; vocoder built, run pending |
-| 4 | Classification-accuracy report on separated stems | `milestone_4_classifier/` | done: 13-class CNN on IMIDataset + Sanidha, tested on all of Concert03 and held-out IMIDataset clips |
+| 3 | Isolated `.wav` stems per instrument | `milestone_3_resynthesis/` | done: mixture-phase ISTFT stems, compared with Griffin-Lim and a BigVGAN vocoder on held-out Concert03 |
+| 4 | Classification-accuracy report on separated stems | `milestone_4_classifier/` | done: 13-class CNN on IMIDataset + Sanidha, tested on all of Concert03, held-out IMIDataset clips, and all 168 live Saraga recordings |
 
 Core software artefacts: the pipeline library is `indian_mss/` at the repo root,
-and the training notebook is `milestone_2_model/train.ipynb`.
+and the training notebook is `milestone_2_model/train.ipynb` (kept in the repo
+at `notebooks/train.ipynb` and copied in when packaging).
 
 ## `sample/`
 
@@ -49,5 +50,9 @@ python scripts/evaluate_classifier.py --classifier checkpoints/classifier/classi
 Add `--methods direct mixture_phase griffin_lim griffin_lim_mixinit oracle_mixture_phase`
 to either resynthesis comparison to leave out the vocoder.
 
-`*.wav`, `*.npy` and `*.pt` are git-ignored, so this folder is for handing in
-(zip it), not for committing.
+`*.wav`, `*.npy`, `*.pt` and `*.log` are git-ignored. To hand in, build the zip,
+which holds this folder, those artefacts, the notebook and the source:
+
+```bash
+python scripts/package_deliverables.py     # -> dist/indian_mss_handin.zip
+```

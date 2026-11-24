@@ -88,4 +88,7 @@ classifier:
   lr: 1.0e-3
   seed: 0
   test_concerts: [Concert03]  # = the separator's held-out concert: unseen by both networks
+  live:                   # Saraga test: "instrument playing" windows chosen from bled close mics (classify/live.py)
+    floor_percentile: 5.0 # bleed floor = this percentile of mic-to-other-mics ratio, per concert and mic
+    margin_db: 10.0       # a window counts when its ratio is this far above the floor
   split_by: recording     # never by window -- adjacent windows leak

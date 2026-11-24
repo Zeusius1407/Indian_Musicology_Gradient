@@ -33,6 +33,7 @@ imss-resynthesize = "indian_mss.cli.resynthesize:main"
 imss-compare-resynthesis = "indian_mss.cli.compare_resynthesis:main"
 imss-train-classifier = "indian_mss.cli.train_classifier:main"
 imss-evaluate-classifier = "indian_mss.cli.evaluate_classifier:main"
+imss-evaluate-classifier-saraga = "indian_mss.cli.evaluate_classifier_saraga:main"
 
 [tool.setuptools.packages.find]
 include = ["indian_mss*"]

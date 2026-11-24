@@ -16,18 +16,20 @@ that measures how much cross-instrument bleed actually survived.
 | Milestone | Component | State |
 |---|---|---|
 | 1 | STFT front end, HPSS, tonic normalization, SDR metrics | **done** |
-| 2 | HTDemucs / U-Net fine-tuning on Sanidha, mask prediction | **done** — needs a GPU run on real data |
-| 3 | ISTFT / Griffin-Lim / vocoder resynthesis | **done**: all three in `infer/`, compared on held-out Concert03 (vocoder run pending) |
-| 4 | MFCC + 2-D CNN instrument classifier | **done**: trained on IMIDataset + Sanidha (13 classes); separated stems 94.8% balanced accuracy vs 95.7% clean, 22.3% raw mix |
+| 2 | HTDemucs / U-Net fine-tuning on Sanidha, mask prediction | **done**: trained on Sanidha (8.89 dB on held-out Concert03); 3.44 dB mean on live Saraga |
+| 3 | ISTFT / Griffin-Lim / vocoder resynthesis | **done**: all three in `infer/`, compared on held-out Concert03 (listening tests pending) |
+| 4 | MFCC + 2-D CNN instrument classifier | **done**: trained on IMIDataset + Sanidha (13 classes); separated stems 94.8% balanced accuracy vs 95.7% clean, 22.3% raw mix; on live Saraga 86.3% vs 60.0% for the close mics |
 
 ## Install
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
-pip install compiam           # install first: most constrained dependency
 pip install -e ".[dev]"
 pytest                        # no data required; model tests need torch
 ```
+
+compIAM is optional (`.[iam]`) and not used by the pipeline: its 0.4.1 release
+pins `numpy<=1.26.4`, so it installs only on Python ≤ 3.12 (see the tonic note below).
 
 `torch` is deliberately not pulled in by the base install — install the build that
 matches your CUDA version from pytorch.org, then `pip install -e ".[train]"`.
@@ -143,7 +145,10 @@ each performance picks its own Sa. Unnormalized, the network learns the same
 phrase separately at a dozen absolute pitches and the classifier partly learns the
 tonic instead of the timbre. `dsp/tonic.py` estimates it from a folded pitch
 histogram (the drone makes Sa the modal pitch class) and either shifts or records
-it. Swap in compIAM's tonic identification for real runs.
+it. On Saraga's annotated tonics it is scored in `deliverables/milestone_1_preprocessing/`.
+compIAM's tonic models are not used: compIAM 0.4.1 pins `numpy<=1.26.4`,
+`scikit-image~=0.24` and `torch==2.0.0`, which cannot be installed alongside
+this project's Python 3.14 / torch 2.11 environment.
 
 **Silent windows are dropped before classification.** A separated stem is mostly
 silence wherever its instrument is not playing. Feed those windows to the
@@ -196,9 +201,12 @@ Saraga number. How it is built:
 fast Griffin-Lim (random or mixture-phase init) and a pretrained BigVGAN vocoder
 (HiFi-GAN generator, trained on music as well as speech, at the pipeline's own
 44.1 kHz / hop-512 grid). Results are in
-`deliverables/milestone_3_resynthesis/`. *Still to do:* the vocoder run, then
-listening tests. Vocoders often score *worse* on SDR while sounding better, so
-judge them on `mag_snr` and by ear.
+`deliverables/milestone_3_resynthesis/`. The off-the-shelf vocoder is the
+weakest method even on the phase-blind `mag_snr` (8.8 dB against 10.8 for
+mixture-phase ISTFT), because it adds its own spectral error to the mask's.
+*Still to do:* listening tests, which are the only fair way to judge the
+vocoder and Griffin-Lim, and possibly fine-tuning the vocoder on masked
+Sanidha estimates.
 
 **Milestone 4** — implemented in `classify/`: MFCC (+ deltas) windows into a
 ~100k-parameter 2-D CNN over 13 classes, IMIDataset's ten plus Sanidha's vocal,
@@ -209,8 +217,12 @@ ground-truth stem, separated stem, a −12 dB simulated-bleed control, and raw
 mixture: 95.7% / 94.8% / 52.1% / 22.3% balanced accuracy. The control
 shows the classifier does detect bleed, so separated stems scoring near clean ones
 means little bleed is left. Report: `deliverables/milestone_4_classifier/`.
-*Still to do:* the same test on Saraga's live close mics, which needs a window
-rule that does not rely on a clean reference.
+On Saraga's live close mics (`classify/live.py` picks windows from the bled
+mics, without a clean reference): separated stems 86.3% balanced accuracy over
+vocal, violin and mridangam, against 60.0% for the close mics themselves and
+16.0% for the mix. For vocal and violin the gain is bleed removal. For
+mridangam it is mostly a recording-domain effect. Ghatam cannot be tested this
+way. Report: `deliverables/milestone_4_classifier/saraga/`.
 
 ## Layout
 
@@ -222,12 +234,13 @@ indian_mss/
   train/    augment.py dataset.py losses.py loop.py report.py — Milestone 2 training
   infer/    resynth.py vocoder.py                  — Milestone 3 resynthesis
   eval/     sdr.py                                 — SDR / SIR / SAR / SI-SDR / magnitude SNR
-  classify/ data.py model.py train.py evaluate.py report.py — Milestone 4 timbre classifier
+  classify/ data.py model.py train.py evaluate.py live.py report.py — Milestone 4 timbre classifier
 configs/default.yaml                               — all hyperparameters
 scripts/preprocess.py                              — Milestone 1 CLI
 scripts/train.py  scripts/separate.py              — Milestone 2 CLIs
 scripts/resynthesize.py  scripts/compare_resynthesis.py — Milestone 3 CLIs
 scripts/train_classifier.py  scripts/evaluate_classifier.py — Milestone 4 CLIs
+scripts/evaluate_classifier_saraga.py              — Milestone 4 on live Saraga
 notebooks/train.ipynb                              — training run + charts
 tests/                                             — run without any dataset
 ```

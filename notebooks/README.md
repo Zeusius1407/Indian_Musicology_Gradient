@@ -1,17 +1,29 @@
 # Notebooks
 
-`train.ipynb` (Milestone 2 deliverable) should contain, in order:
+`train.ipynb` is the Milestone 2 deliverable (proposal core artefact 2). It is
+committed with its charts rendered, so it reads without a GPU, and
+`scripts/package_deliverables.py` copies it into
+`deliverables/milestone_2_model/` for hand-in. Edit it here only.
 
-1. Config load from `configs/default.yaml` — no hard-coded numbers. *(done)*
-2. Dataset statistics: track count, total hours, per-stem duration. *(done)*
-3. HPSS baseline table, loaded from `out/hpss_baseline.json`. *(done)*
-4. Training loop with loss curves (per step, per epoch, validation). *(done)*
-5. Per-stem validation SDR per epoch, on one axis with the baseline drawn in. *(done)*
-6. Final evaluation: Sanidha held-out *(done)*, then Saraga — `data/saraga.py` is in
-   place, so this needs only a trained `best.pt` and the extracted `saraga1.5_carnatic`.
-7. Milestone 4 confusion matrices for the three classifier inputs.
+Sections:
 
-The charts come from `indian_mss/train/report.py`; set `RUN_TRAINING = False` to
-redraw them from a finished run's `history.json` without a GPU.
+1. Dataset statistics: track count, total hours, per-stem duration.
+2. The HPSS baseline from `out/hpss_baseline.json`.
+3. Training, or loading a finished run's `history.json`.
+4. Loss curves per step and per epoch.
+5. Per-stem validation SDR per epoch, with the baseline drawn in.
+6. The selected checkpoint scored per track on held-out Concert03.
+7. The live test on all 168 Saraga recordings (read from
+   `deliverables/milestone_2_model/saraga/saraga_eval.json`).
 
-Keep the rendered charts committed so the notebook can be read without a GPU.
+The Milestone 4 confusion matrices are in `deliverables/milestone_4_classifier/`,
+not here: they come from a different network.
+
+To re-render the charts from the delivered run, without training:
+
+```bash
+IMSS_RUN_TRAINING=0 IMSS_RUN_DIR=checkpoints/htdemucs_concertsplit IMSS_SANIDHA_ROOT=data/sanidha_flat \
+    jupyter nbconvert --to notebook --execute --inplace notebooks/train.ipynb
+```
+
+The charts come from `indian_mss/train/report.py`.

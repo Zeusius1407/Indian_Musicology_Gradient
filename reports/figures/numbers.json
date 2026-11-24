@@ -1,20 +1,21 @@
 {
-  "note": "all numbers are on synthetic audio; see reports/make_figures.py",
-  "hpss_default": {
+  "note": "Milestone 1 figures are on real audio; see reports/make_figures.py",
+  "hpss_default_sample_clip": {
     "harmonic": {
-      "sdr": 13.05839624102181,
-      "sir": 18.05462886555951,
-      "sar": 14.778469288639995,
-      "si_sdr": 13.058397657833643
+      "sdr": 3.6126037857062547,
+      "sir": 6.2158761643410685,
+      "sar": 8.002802060472384,
+      "si_sdr": 3.612947577461176
     },
     "percussive": {
-      "sdr": -18.374480893316008,
-      "sir": -9.130080991620886,
-      "sar": -8.193525067677712,
-      "si_sdr": -18.379666720244103
+      "sdr": 2.885523667201464,
+      "sir": 10.610301139763727,
+      "sar": 4.050628620921151,
+      "si_sdr": 2.8859352009787544
     }
   },
   "kernel_sweep": {
+    "data": "Sanidha Concert03, 6 tracks, central 30 s",
     "harmonic_ms": [
       50,
       100,
@@ -31,119 +32,1121 @@
     ],
     "mean_sdr": [
       [
-        -1.4956795625103378,
-        -0.08099360389070309,
-        1.016739227778146,
-        1.652293316227519,
-        2.2997189471762507
+        4.051425090127479,
+        2.98359793074828,
+        2.3722067727475045,
+        2.2131041736900583,
+        1.3373113163690133
       ],
       [
-        -3.3088069672862446,
-        -2.1835241845205404,
-        -1.2123943565268522,
-        -0.8088323564334061,
-        -0.5742135769757439
+        4.824933777238129,
+        4.56331955201806,
+        4.036714074833873,
+        4.195121590537166,
+        3.3051639022266994
       ],
       [
-        -4.647744537262119,
-        -3.2816205530480644,
-        -2.6580423261470987,
-        -2.4120740046931566,
-        -2.3581371588333147
+        4.5102058799853095,
+        5.412088242264318,
+        5.071358440238535,
+        5.548969567272794,
+        4.771624306594375
       ],
       [
-        -4.058202641827779,
-        -2.8917065910046356,
-        -2.4228232487587125,
-        -2.1360809623093866,
-        -2.0895696842870235
+        3.155962835633434,
+        5.032500268190275,
+        4.650329997775911,
+        5.403551057129432,
+        4.8175028619526765
       ],
       [
-        -5.04686462616742,
-        -4.0644697918198975,
-        -3.4555620822734463,
-        -3.2953339994554254,
-        -3.09939304355383
+        1.8107318793324314,
+        4.041914774015122,
+        3.5527454604112774,
+        4.388902153630957,
+        3.9630007313429525
+      ]
+    ],
+    "harmonic_sdr": [
+      [
+        7.0209766464949865,
+        6.3584019512289,
+        5.99865655597239,
+        5.866048096892076,
+        5.488493726491836
+      ],
+      [
+        7.7853444830158285,
+        7.593583136880889,
+        7.1952666204012035,
+        7.253240428418615,
+        6.686482305468354
+      ],
+      [
+        7.3193667064083465,
+        8.270747407162062,
+        7.99809650022689,
+        8.375416668008103,
+        7.776929381701293
+      ],
+      [
+        5.723655348228907,
+        7.8258262808198245,
+        7.529476445723932,
+        8.23306198826024,
+        7.801416203201418
+      ],
+      [
+        4.098868944763373,
+        6.765275896096888,
+        6.351925670503417,
+        7.208166397306077,
+        6.96759829412634
+      ]
+    ],
+    "percussive_sdr": [
+      [
+        1.081873533759972,
+        -0.3912060897323401,
+        -1.2542430104773814,
+        -1.439839749511959,
+        -2.813871093753809
+      ],
+      [
+        1.864523071460429,
+        1.5330559671552304,
+        0.8781615292665436,
+        1.1370027526557165,
+        -0.07615450101495526
+      ],
+      [
+        1.7010450535622723,
+        2.553429077366573,
+        2.144620380250182,
+        2.722522466537484,
+        1.7663192314874576
+      ],
+      [
+        0.5882703230379615,
+        2.239174255560726,
+        1.7711835498278905,
+        2.5740401259986254,
+        1.8335895207039346
+      ],
+      [
+        -0.4774051860985101,
+        1.3185536519333543,
+        0.7535652503191382,
+        1.569637909955836,
+        0.9584031685595646
       ]
     ]
   },
   "kernel_best": {
-    "harmonic_ms": 50,
-    "percussive_hz": 2000,
-    "mean_sdr": 2.2997189471762507
+    "harmonic_ms": 200,
+    "percussive_hz": 1000,
+    "mean_sdr": 5.548969567272794
   },
-  "tonic": {
-    "true": [
-      105.0,
-      111.63208273920476,
-      118.68306568278705,
-      126.17940769565095,
-      134.14923885585463,
-      142.62246601293427,
-      151.63088501357421,
-      161.20830001575365,
-      171.39065033909665,
-      182.2161453274299,
-      193.7254077296246,
-      205.96162613675833,
-      218.97071704761646,
-      232.8014971706905,
-      247.505866609231,
-      263.1390036167639,
-      279.75957165389025,
-      297.429939523348,
-      316.2164154094001,
-      336.1894956997798,
-      357.42412952389793,
-      380.0
-    ],
-    "old": [
-      105.03231989077202,
-      111.9224927628101,
-      118.57775051089261,
-      126.35651042638443,
-      134.64556089438005,
-      143.4783772311,
-      151.13453207727025,
-      161.9819807532584,
-      171.61393055929497,
-      182.87189049042058,
-      194.86837824034143,
-      103.22792750164484,
-      109.99973132782155,
-      115.86943094622772,
-      124.1857812073484,
-      132.33243074967567,
-      140.20132656613853,
-      149.39860391785615,
-      158.2823071997706,
-      168.66570595098943,
-      179.73026086889675,
-      190.41757833016473
-    ],
-    "new": [
-      105.03231989077202,
-      111.9224927628101,
-      118.57775051089261,
-      126.35651042638443,
-      134.64556089438005,
-      143.4783772311,
-      151.13453207727025,
-      161.9819807532584,
-      171.61393055929497,
-      182.87189049042058,
-      194.86837824034143,
-      206.45585500328968,
-      219.9994626556431,
-      231.73886189245545,
-      248.3715624146968,
-      264.66486149935133,
-      280.40265313227707,
-      298.7972078357123,
-      316.56461439954126,
-      337.33141190197887,
-      359.4605217377935,
-      380.83515666032946
+  "kernel_config_default": {
+    "harmonic_ms": 200.0,
+    "percussive_hz": 500.0,
+    "mean_sdr": 5.071358440238535
+  },
+  "tonic_saraga": {
+    "data": "Saraga Carnatic, 197 annotated recordings, central 30 s of the released audio",
+    "n": 197,
+    "correct_within_50_cents": 0.34517766497461927,
+    "octave_error": 0.14213197969543148,
+    "pa_taken_for_sa": 0.20304568527918782,
+    "ma_taken_for_sa": 0.10152284263959391,
+    "other": 0.20812182741116753,
+    "median_abs_cents_when_correct": 9.995771419474773,
+    "per_recording": [
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Akkarai Sisters at Arkay by Akkarai Sisters/Apparama Bhakti/Apparama Bhakti.mp3.mp3",
+        "true_hz": 195.997718,
+        "est_hz": 197.13263972803753
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Akkarai Sisters at Arkay by Akkarai Sisters/Brova Barama/Brova Barama.mp3.mp3",
+        "true_hz": 195.997718,
+        "est_hz": 194.86837824034143
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Akkarai Sisters at Arkay by Akkarai Sisters/Geeta Nayakan/Geeta Nayakan.mp3.mp3",
+        "true_hz": 130.059356,
+        "est_hz": 197.13263972803753
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Akkarai Sisters at Arkay by Akkarai Sisters/Karunimpa Idi/Karunimpa Idi.mp3.mp3",
+        "true_hz": 195.997718,
+        "est_hz": 197.13263972803753
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Akkarai Sisters at Arkay by Akkarai Sisters/Koti Janmani/Koti Janmani.mp3.mp3",
+        "true_hz": 130.059356,
+        "est_hz": 389.7367564806828
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Akkarai Sisters at Arkay by Akkarai Sisters/Manadirkkugandhadu/Manadirkkugandhadu.mp3.mp3",
+        "true_hz": 195.997718,
+        "est_hz": 312.9285596815548
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Akkarai Sisters at Arkay by Akkarai Sisters/Pavamana Suthudu Mangalam/Pavamana Suthudu Mangalam.mp3.mp3",
+        "true_hz": 195.997718,
+        "est_hz": 197.13263972803753
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Akkarai Sisters at Arkay by Akkarai Sisters/Shankari Shankuru/Shankari Shankuru.mp3.mp3",
+        "true_hz": 195.997718,
+        "est_hz": 391.99447854295175
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Akkarai Sisters at Arkay by Akkarai Sisters/Siddhi Vinayakam/Siddhi Vinayakam.mp3.mp3",
+        "true_hz": 195.997718,
+        "est_hz": 197.13263972803753
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Akkarai Sisters at Arkay by Akkarai Sisters/Thillana Pahadi/Thillana Pahadi.mp3.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 257.13036664761506
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Ashwath Narayanan at Arkay by Ashwath Narayanan/Angakaram/Ashwath Narayanan - Angakaram.mp3",
+        "true_hz": 138.591315,
+        "est_hz": 137.79275169257048
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Ashwath Narayanan at Arkay by Ashwath Narayanan/Aparadhamula/Ashwath Narayanan - Aparadhamula.mp3",
+        "true_hz": 138.591315,
+        "est_hz": 137.79275169257048
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Ashwath Narayanan at Arkay by Ashwath Narayanan/Eranapai/Ashwath Narayanan - Eranapai.mp3",
+        "true_hz": 138.591315,
+        "est_hz": 137.79275169257048
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Ashwath Narayanan at Arkay by Ashwath Narayanan/Evarura/Ashwath Narayanan - Evarura.mp3",
+        "true_hz": 138.591315,
+        "est_hz": 207.651841604437
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Ashwath Narayanan at Arkay by Ashwath Narayanan/Marubari/Ashwath Narayanan - Marubari.mp3",
+        "true_hz": 137.793088,
+        "est_hz": 137.79275169257048
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Ashwath Narayanan at Arkay by Ashwath Narayanan/Parama Purusham/Ashwath Narayanan - Parama Purusham.mp3",
+        "true_hz": 138.591315,
+        "est_hz": 137.79275169257048
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Ashwath Narayanan at Arkay by Ashwath Narayanan/Sadabalarupapi Shlokam/Ashwath Narayanan - Sadabalarupapi Shlokam.mp3",
+        "true_hz": 207.652349,
+        "est_hz": 137.79275169257048
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Ashwath Narayanan at Arkay by Ashwath Narayanan/Samajavarada/Ashwath Narayanan - Samajavarada.mp3",
+        "true_hz": 138.591315,
+        "est_hz": 137.79275169257048
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Ashwath Narayanan at Arkay by Ashwath Narayanan/Thillana Purnachandrika/Ashwath Narayanan - Thillana Purnachandrika.mp3",
+        "true_hz": 138.591315,
+        "est_hz": 137.79275169257048
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Chaitra Sairam at Arkay by Chaitra Sairam/Anandaamrutakarshini/Chaitra Sairam - Anandaamrutakarshini.mp3",
+        "true_hz": 197.133121,
+        "est_hz": 194.86837824034143
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Chaitra Sairam at Arkay by Chaitra Sairam/Ardhanareeshwaram/Chaitra Sairam - Ardhanareeshwaram.mp3",
+        "true_hz": 197.133121,
+        "est_hz": 198.27461749253243
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Chaitra Sairam at Arkay by Chaitra Sairam/Gange Maampahi/Chaitra Sairam - Gange Maampahi.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 325.8406656436324
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Chaitra Sairam at Arkay by Chaitra Sairam/Govardhana Girisham/Chaitra Sairam - Govardhana Girisham.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 391.99447854295175
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Chaitra Sairam at Arkay by Chaitra Sairam/Kamalamba Samrakshatu/Chaitra Sairam - Kamalamba Samrakshatu.mp3",
+        "true_hz": 197.133121,
+        "est_hz": 194.86837824034143
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Chaitra Sairam at Arkay by Chaitra Sairam/Mamava Pattabhi Rama/Chaitra Sairam - Mamava Pattabhi Rama.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 394.265279456075
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Chaitra Sairam at Arkay by Chaitra Sairam/Rakta Ganapatim/Chaitra Sairam - Rakta Ganapatim.mp3",
+        "true_hz": 197.133121,
+        "est_hz": 290.291031339907
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Chaitra Sairam at Arkay by Chaitra Sairam/Shri Subramanyaya Namaste/Chaitra Sairam - Shri Subramanyaya Namaste.mp3",
+        "true_hz": 197.133121,
+        "est_hz": 293.66405064874454
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Cherthala Ranganatha Sharma at Arkay by Cherthala Ranganatha Sharma/Bhuvini Dasudane/Bhuvini Dasudane.mp3.mp3",
+        "true_hz": 201.74089,
+        "est_hz": 227.75772695133833
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Cherthala Ranganatha Sharma at Arkay by Cherthala Ranganatha Sharma/Idhu Thaano Thillai Sthalam/Idhu Thaano Thillai Sthalam.mp3.mp3",
+        "true_hz": 136.2104,
+        "est_hz": 167.69426296819753
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Cherthala Ranganatha Sharma at Arkay by Cherthala Ranganatha Sharma/Karuna Nidhi Illalo/Karuna Nidhi Illalo.mp3.mp3",
+        "true_hz": 135.425885,
+        "est_hz": 135.42555469368926
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Cherthala Ranganatha Sharma at Arkay by Cherthala Ranganatha Sharma/Prathi Vaaram Vaaram/Prathi Vaaram Vaaram.mp3.mp3",
+        "true_hz": 136.2104,
+        "est_hz": 135.42555469368926
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Cherthala Ranganatha Sharma at Arkay by Cherthala Ranganatha Sharma/Rama Rama Guna Seema/Rama Rama Guna Seema.mp3.mp3",
+        "true_hz": 135.425885,
+        "est_hz": 135.42555469368926
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Cherthala Ranganatha Sharma at Arkay by Cherthala Ranganatha Sharma/Shlokam - Shivah Shaktyayukto/Shlokam - Shivah Shaktyayukto.mp3.mp3",
+        "true_hz": 135.425885,
+        "est_hz": 229.0771140413157
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Cherthala Ranganatha Sharma at Arkay by Cherthala Ranganatha Sharma/Tulasi Bilva/Tulasi Bilva.mp3.mp3",
+        "true_hz": 135.425885,
+        "est_hz": 135.42555469368926
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Cherthala Ranganatha Sharma at Arkay by Cherthala Ranganatha Sharma/Varashiki Vahana/Varashiki Vahana.mp3.mp3",
+        "true_hz": 135.425885,
+        "est_hz": 134.64556089438005
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Cherthala Ranganatha Sharma at Arkay by Cherthala Ranganatha Sharma/Velum Mayilume/Velum Mayilume.mp3.mp3",
+        "true_hz": 135.425885,
+        "est_hz": 200.57845757387344
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Dr S Sundar at Arkay by S Sundar/Devadi Devanukku Jaya Mangalam/Devadi Devanukku Jaya Mangalam.mp3.mp3",
+        "true_hz": 170.625924,
+        "est_hz": 152.89063075030109
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Dr S Sundar at Arkay by S Sundar/Enadhu Manam Kavalai/Enadhu Manam Kavalai.mp3.mp3",
+        "true_hz": 170.625924,
+        "est_hz": 113.22296948590993
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Dr S Sundar at Arkay by S Sundar/Eppadi Manam Thunindhadho/Eppadi Manam Thunindhadho.mp3.mp3",
+        "true_hz": 113.223246,
+        "est_hz": 114.53855702065785
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Dr S Sundar at Arkay by S Sundar/Geetha Vaadya Natana/Geetha Vaadya Natana.mp3.mp3",
+        "true_hz": 170.625924,
+        "est_hz": 100.28922878693672
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Dr S Sundar at Arkay by S Sundar/Jaya Jaya Padmanabhanujese/Jaya Jaya Padmanabhanujese.mp3.mp3",
+        "true_hz": 169.643191,
+        "est_hz": 112.57085316755231
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Dr S Sundar at Arkay by S Sundar/Kannanai Paadu Maname/Kannanai Paadu Maname.mp3.mp3",
+        "true_hz": 227.758283,
+        "est_hz": 190.41757833016473
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Dr S Sundar at Arkay by S Sundar/Nannu Brova Neeku/Nannu Brova Neeku.mp3.mp3",
+        "true_hz": 226.446492,
+        "est_hz": 255.64940471208612
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Dr S Sundar at Arkay by S Sundar/Nera Nammiti/Nera Nammiti.mp3.mp3",
+        "true_hz": 227.758283,
+        "est_hz": 227.75772695133833
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Dr S Sundar at Arkay by S Sundar/Paahi Maam Sri/Paahi Maam Sri.mp3.mp3",
+        "true_hz": 170.625924,
+        "est_hz": 112.57085316755231
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Dr S Sundar at Arkay by S Sundar/Parvathi Ninnu Neranammiti/Parvathi Ninnu Neranammiti.mp3.mp3",
+        "true_hz": 169.643191,
+        "est_hz": 170.62550705226855
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Dr S Sundar at Arkay by S Sundar/Purahara Nandana/Purahara Nandana.mp3.mp3",
+        "true_hz": 170.625924,
+        "est_hz": 113.22296948590993
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Dr S Sundar at Arkay by S Sundar/Shloka Namaste Sarvalokaanam/Shloka Namaste Sarvalokaanam.mp3.mp3",
+        "true_hz": 226.446492,
+        "est_hz": 285.3040051738056
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Dr S Sundar at Arkay by S Sundar/Sudhaamayee/Sudhaamayee.mp3.mp3",
+        "true_hz": 113.223246,
+        "est_hz": 113.22296948590993
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Dr S Sundar at Arkay by S Sundar/Vanajaksha Ninne Nammiti/Vanajaksha Ninne Nammiti.mp3.mp3",
+        "true_hz": 113.223246,
+        "est_hz": 169.6427764457314
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/KP Nandini at Arkay by KP Nandini/Ardhanarishwaram/Ardhanarishwaram.mp3.mp3",
+        "true_hz": 197.133121,
+        "est_hz": 194.86837824034143
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/KP Nandini at Arkay by KP Nandini/Bhavamulona/Bhavamulona.mp3.mp3",
+        "true_hz": 197.133121,
+        "est_hz": 197.13263972803753
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/KP Nandini at Arkay by KP Nandini/Eppadi Padinaro/Eppadi Padinaro.mp3.mp3",
+        "true_hz": 197.133121,
+        "est_hz": 297.07626255407837
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/KP Nandini at Arkay by KP Nandini/Janakipathe Jaya Karunya Jaladhe/Janakipathe Jaya Karunya Jaladhe.mp3.mp3",
+        "true_hz": 197.133121,
+        "est_hz": 295.36522918789984
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/KP Nandini at Arkay by KP Nandini/Manasaramathi/Manasaramathi.mp3.mp3",
+        "true_hz": 197.133121,
+        "est_hz": 263.1405040667275
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/KP Nandini at Arkay by KP Nandini/Nadatanum Anisham/Nadatanum Anisham.mp3.mp3",
+        "true_hz": 197.133121,
+        "est_hz": 297.07626255407837
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/KP Nandini at Arkay by KP Nandini/Seethamma/Seethamma.mp3.mp3",
+        "true_hz": 197.133121,
+        "est_hz": 261.6249262868662
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/KP Nandini at Arkay by KP Nandini/Tillana/Tillana.mp3.mp3",
+        "true_hz": 213.737027,
+        "est_hz": 329.62675180601724
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Kanakadurga Venkatesh at Arkay by Kanakadurga Venkatesh/Enthavedukonthu Raghava/Enthavedukonthu Raghava.mp3.mp3",
+        "true_hz": 180.771869,
+        "est_hz": 229.0771140413157
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Kanakadurga Venkatesh at Arkay by Kanakadurga Venkatesh/Etulabrotuva/Etulabrotuva.mp3.mp3",
+        "true_hz": 180.771869,
+        "est_hz": 241.30090616010435
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Kanakadurga Venkatesh at Arkay by Kanakadurga Venkatesh/Koluvamaregatha/Koluvamaregatha.mp3.mp3",
+        "true_hz": 180.771869,
+        "est_hz": 181.81862590551185
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Kanakadurga Venkatesh at Arkay by Kanakadurga Venkatesh/Lokavana Chatura/Lokavana Chatura.mp3.mp3",
+        "true_hz": 180.771869,
+        "est_hz": 270.85110938737853
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Kanakadurga Venkatesh at Arkay by Kanakadurga Venkatesh/Neevada Negana/Neevada Negana.mp3.mp3",
+        "true_hz": 179.7307,
+        "est_hz": 101.45453349375238
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Kanakadurga Venkatesh at Arkay by Kanakadurga Venkatesh/Rama Neepai/Rama Neepai.mp3.mp3",
+        "true_hz": 180.771869,
+        "est_hz": 272.42013390222235
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Kanakadurga Venkatesh at Arkay by Kanakadurga Venkatesh/Vara Leela Gana Lola/Vara Leela Gana Lola.mp3.mp3",
+        "true_hz": 180.771869,
+        "est_hz": 100.28922878693672
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Kuldeep Pai at Arkay by Kuldeep Pai/Arul Seya Vendum Ayya/Arul Seya Vendum Ayya.mp3.mp3",
+        "true_hz": 146.832384,
+        "est_hz": 293.66405064874454
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Kuldeep Pai at Arkay by Kuldeep Pai/Brochevarevarura/Brochevarevarura.mp3.mp3",
+        "true_hz": 145.986692,
+        "est_hz": 100.28922878693672
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Kuldeep Pai at Arkay by Kuldeep Pai/Gange Maam Pahi/Gange Maam Pahi.mp3.mp3",
+        "true_hz": 145.986692,
+        "est_hz": 100.28922878693672
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Kuldeep Pai at Arkay by Kuldeep Pai/Kaalaharanamelara/Kaalaharanamelara.mp3.mp3",
+        "true_hz": 146.832384,
+        "est_hz": 100.28922878693672
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Kuldeep Pai at Arkay by Kuldeep Pai/Kari Kalabha Mukham/Kari Kalabha Mukham.mp3.mp3",
+        "true_hz": 146.832384,
+        "est_hz": 100.28922878693672
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Kuldeep Pai at Arkay by Kuldeep Pai/Krishna Nee Begane Baaro/Krishna Nee Begane Baaro.mp3.mp3",
+        "true_hz": 146.832384,
+        "est_hz": 194.86837824034143
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Kuldeep Pai at Arkay by Kuldeep Pai/Thappi Bratikipova/Thappi Bratikipova.mp3.mp3",
+        "true_hz": 146.832384,
+        "est_hz": 221.27390657776664
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Kuldeep Pai at Arkay by Kuldeep Pai/Vasudeva Sutam Devam/Vasudeva Sutam Devam.mp3.mp3",
+        "true_hz": 146.832384,
+        "est_hz": 246.94104747941458
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Kamarajar Hall by Sanjay Subrahmanyan/Entara Nitana/Sanjay Subrahmanyan - Entara Nitana.mp3",
+        "true_hz": 146.832384,
+        "est_hz": 295.36522918789984
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Kamarajar Hall by Sanjay Subrahmanyan/Kamakshi/Sanjay Subrahmanyan - Kamakshi.mp3",
+        "true_hz": 146.832384,
+        "est_hz": 146.83202532437227
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Kamarajar Hall by Sanjay Subrahmanyan/Maname Ramanai Paada/Sanjay Subrahmanyan - Maname Ramanai Paada.mp3",
+        "true_hz": 146.832384,
+        "est_hz": 146.83202532437227
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Kamarajar Hall by Sanjay Subrahmanyan/Ozhukkam Uyirinum/Sanjay Subrahmanyan - Ozhukkam Uyirinum.mp3",
+        "true_hz": 146.832384,
+        "est_hz": 248.3715624146968
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Kamarajar Hall by Sanjay Subrahmanyan/Pavamana Suthudu/Sanjay Subrahmanyan - Pavamana Suthudu.mp3",
+        "true_hz": 147.682975,
+        "est_hz": 147.68261459394992
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Kamarajar Hall by Sanjay Subrahmanyan/Payum Oli Nee Yenakku/Sanjay Subrahmanyan - Payum Oli Nee Yenakku.mp3",
+        "true_hz": 146.832384,
+        "est_hz": 280.40265313227707
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Kamarajar Hall by Sanjay Subrahmanyan/Raagam Thaanam Pallavi/Sanjay Subrahmanyan - Raagam Thaanam Pallavi.mp3",
+        "true_hz": 146.832384,
+        "est_hz": 146.83202532437227
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Kamarajar Hall by Sanjay Subrahmanyan/Shatre Vilagi Irum/Sanjay Subrahmanyan - Shatre Vilagi Irum.mp3",
+        "true_hz": 145.986692,
+        "est_hz": 146.83202532437227
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Kamarajar Hall by Sanjay Subrahmanyan/Soundararajam/Sanjay Subrahmanyan - Soundararajam.mp3",
+        "true_hz": 146.832384,
+        "est_hz": 295.36522918789984
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Kamarajar Hall by Sanjay Subrahmanyan/Teerthakarayinile/Sanjay Subrahmanyan - Teerthakarayinile.mp3",
+        "true_hz": 146.832384,
+        "est_hz": 221.27390657776664
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Kamarajar Hall by Sanjay Subrahmanyan/Thillana Dhanashri/Sanjay Subrahmanyan - Thillana Dhanashri.mp3",
+        "true_hz": 147.682975,
+        "est_hz": 109.36617949518963
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Kamarajar Hall by Sanjay Subrahmanyan/Undan Paada Pankayam/Sanjay Subrahmanyan - Undan Paada Pankayam.mp3",
+        "true_hz": 146.832384,
+        "est_hz": 147.68261459394992
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Vani Mahal by Sanjay Subrahmanyan/Aru marundu/Sanjay Subrahmanyan - Aru marundu.mp3",
+        "true_hz": 147.682975,
+        "est_hz": 147.68261459394992
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Vani Mahal by Sanjay Subrahmanyan/Ennadu Jootuno/Sanjay Subrahmanyan - Ennadu Jootuno.mp3",
+        "true_hz": 147.682975,
+        "est_hz": 147.68261459394992
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Vani Mahal by Sanjay Subrahmanyan/Eranapai/Sanjay Subrahmanyan - Eranapai.mp3",
+        "true_hz": 147.682975,
+        "est_hz": 147.68261459394992
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Vani Mahal by Sanjay Subrahmanyan/Karuvutranaal Mudalaaga/Sanjay Subrahmanyan - Karuvutranaal Mudalaaga.mp3",
+        "true_hz": 147.682975,
+        "est_hz": 221.27390657776664
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Vani Mahal by Sanjay Subrahmanyan/Maname Kanamum/Sanjay Subrahmanyan - Maname Kanamum.mp3",
+        "true_hz": 147.682975,
+        "est_hz": 147.68261459394992
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Vani Mahal by Sanjay Subrahmanyan/Paarengum/Sanjay Subrahmanyan - Paarengum.mp3",
+        "true_hz": 147.682975,
+        "est_hz": 297.07626255407837
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Vani Mahal by Sanjay Subrahmanyan/Pavamaana Suthudu Pattu/Sanjay Subrahmanyan - Pavamaana Suthudu Pattu.mp3",
+        "true_hz": 147.682975,
+        "est_hz": 221.27390657776664
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Vani Mahal by Sanjay Subrahmanyan/Pullum Silambena Kan/Sanjay Subrahmanyan - Pullum Silambena Kan.mp3",
+        "true_hz": 147.682975,
+        "est_hz": 110.63695328888335
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Vani Mahal by Sanjay Subrahmanyan/Ragam Thanam Pallavi - Shanmukhapriya/Sanjay Subrahmanyan - Ragam Thanam Pallavi - Shanmukhapriya.mp3",
+        "true_hz": 147.682975,
+        "est_hz": 221.27390657776664
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Vani Mahal by Sanjay Subrahmanyan/Sarasadalanayana/Sanjay Subrahmanyan - Sarasadalanayana.mp3",
+        "true_hz": 147.682975,
+        "est_hz": 295.36522918789984
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Vani Mahal by Sanjay Subrahmanyan/Saravanabhava Enum/Sanjay Subrahmanyan - Saravanabhava Enum.mp3",
+        "true_hz": 147.682975,
+        "est_hz": 221.27390657776664
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Live at Vani Mahal by Sanjay Subrahmanyan/Sri Raghuvara Sugunaalaya/Sanjay Subrahmanyan - Sri Raghuvara Sugunaalaya.mp3",
+        "true_hz": 147.682975,
+        "est_hz": 297.07626255407837
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Mahati at Arkay by Mahati/Chinnanchiru Kiliye/Chinnanchiru Kiliye.mp3.mp3",
+        "true_hz": 190.418043,
+        "est_hz": 100.28922878693672
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Mahati at Arkay by Mahati/Gopi Gopala Bala/Gopi Gopala Bala.mp3.mp3",
+        "true_hz": 127.088797,
+        "est_hz": 100.28922878693672
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Mahati at Arkay by Mahati/Hiranmayeem/Hiranmayeem.mp3.mp3",
+        "true_hz": 127.088797,
+        "est_hz": 380.83515666032946
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Mahati at Arkay by Mahati/Kannallavo Swami/Kannallavo Swami.mp3.mp3",
+        "true_hz": 190.418043,
+        "est_hz": 283.66077502084823
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Mahati at Arkay by Mahati/Padavini/Padavini.mp3.mp3",
+        "true_hz": 190.418043,
+        "est_hz": 100.28922878693672
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Mahati at Arkay by Mahati/Pavamana Suttudu Pattu/Pavamana Suttudu Pattu.mp3.mp3",
+        "true_hz": 190.418043,
+        "est_hz": 380.83515666032946
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Mahati at Arkay by Mahati/Ragam Tanam Pallavi/Ragam Tanam Pallavi.mp3.mp3",
+        "true_hz": 190.418043,
+        "est_hz": 100.28922878693672
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Mahati at Arkay by Mahati/Sharanagatha Vatsale/Sharanagatha Vatsale.mp3.mp3",
+        "true_hz": 127.088797,
+        "est_hz": 109.36617949518963
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Mahati at Arkay by Mahati/Tillana/Tillana.mp3.mp3",
+        "true_hz": 190.418043,
+        "est_hz": 106.25273666151527
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Mahati at Arkay by Mahati/Vandu Ketpaar Illayo/Vandu Ketpaar Illayo.mp3.mp3",
+        "true_hz": 127.088797,
+        "est_hz": 100.28922878693672
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Modhumudi Sudhakar at Arkay by Modhumudi Sudhakar/Dudukugala/Dudukugala.mp3.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 130.81246314343312
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Modhumudi Sudhakar at Arkay by Modhumudi Sudhakar/Edari Sancharintura/Edari Sancharintura.mp3.mp3",
+        "true_hz": 195.997718,
+        "est_hz": 194.86837824034143
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Modhumudi Sudhakar at Arkay by Modhumudi Sudhakar/Entha Muddo/Entha Muddo.mp3.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 257.13036664761506
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Modhumudi Sudhakar at Arkay by Modhumudi Sudhakar/Eramuni/Eramuni.mp3.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 130.81246314343312
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Modhumudi Sudhakar at Arkay by Modhumudi Sudhakar/Ghandhamu Poyyaruga/Ghandhamu Poyyaruga.mp3.mp3",
+        "true_hz": 173.608412,
+        "est_hz": 172.60807994544766
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Modhumudi Sudhakar at Arkay by Modhumudi Sudhakar/Giriraja Suta/Giriraja Suta.mp3.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 130.81246314343312
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Modhumudi Sudhakar at Arkay by Modhumudi Sudhakar/Koluvaiyunnade/Koluvaiyunnade.mp3.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 193.7460189703152
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Modhumudi Sudhakar at Arkay by Modhumudi Sudhakar/Mangalam Avanisutanatha/Mangalam Avanisutanatha.mp3.mp3",
+        "true_hz": 173.608412,
+        "est_hz": 231.73886189245545
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Modhumudi Sudhakar at Arkay by Modhumudi Sudhakar/Paraloka Bhaya/Paraloka Bhaya.mp3.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 130.81246314343312
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Modhumudi Sudhakar at Arkay by Modhumudi Sudhakar/Paramatmudu/Paramatmudu.mp3.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 129.30995385418012
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Modhumudi Sudhakar at Arkay by Modhumudi Sudhakar/Rama Namam Bhajare/Rama Namam Bhajare.mp3.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 194.86837824034143
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Modhumudi Sudhakar at Arkay by Modhumudi Sudhakar/Shobillu Saptasvara/Shobillu Saptasvara.mp3.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 130.81246314343312
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Modhumudi Sudhakar at Arkay by Modhumudi Sudhakar/Sundari Nee Divya/Sundari Nee Divya.mp3.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 130.81246314343312
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Modhumudi Sudhakar at Arkay by Modhumudi Sudhakar/Telisi Rama/Telisi Rama.mp3.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 127.82470235604306
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Rithvik Raja at Arkay by Rithvik Raja/Bhogeendra Shayinam/Rithvik Raja - Bhogeendra Shayinam.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 221.27390657776664
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Rithvik Raja at Arkay by Rithvik Raja/Chintayama Kanda/Rithvik Raja - Chintayama Kanda.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 194.86837824034143
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Rithvik Raja at Arkay by Rithvik Raja/Emani Migula/Rithvik Raja - Emani Migula.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 261.6249262868662
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Rithvik Raja at Arkay by Rithvik Raja/Endaro Mahanubhavulu/Rithvik Raja - Endaro Mahanubhavulu.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 130.81246314343312
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Rithvik Raja at Arkay by Rithvik Raja/Karunimpa Idi/Rithvik Raja - Karunimpa Idi.mp3",
+        "true_hz": 130.059356,
+        "est_hz": 130.81246314343312
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Rithvik Raja at Arkay by Rithvik Raja/Madhava Mamava/Rithvik Raja - Madhava Mamava.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 163.86412070860806
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Rithvik Raja at Arkay by Rithvik Raja/Ramachandraya Mangalam/Rithvik Raja - Ramachandraya Mangalam.mp3",
+        "true_hz": 174.614116,
+        "est_hz": 172.60807994544766
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Rithvik Raja at Arkay by Rithvik Raja/Sapasyat Kausalya/Rithvik Raja - Sapasyat Kausalya.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 130.81246314343312
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Rithvik Raja at Arkay by Rithvik Raja/Saraguna Palimpa/Rithvik Raja - Saraguna Palimpa.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 394.265279456075
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Rithvik Raja at Arkay by Rithvik Raja/Seetapati Namanasuna/Rithvik Raja - Seetapati Namanasuna.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 130.81246314343312
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Rithvik Raja at Arkay by Rithvik Raja/Thillana Senchurutti/Rithvik Raja - Thillana Senchurutti.mp3",
+        "true_hz": 130.812783,
+        "est_hz": 221.27390657776664
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sanjay at Sastri Hall by Sanjay Subrahmanyan/Chalamelara Saketha Rama/Sanjay Subrahmanyan - Chalamelara Saketha Rama.mp3",
+        "true_hz": 145.986692,
+        "est_hz": 218.73235899037925
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sanjay at Sastri Hall by Sanjay Subrahmanyan/Deenarakshaka/Sanjay Subrahmanyan - Deenarakshaka.mp3",
+        "true_hz": 145.14587,
+        "est_hz": 293.66405064874454
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sanjay at Sastri Hall by Sanjay Subrahmanyan/Ganta mani aadudhu/Sanjay Subrahmanyan - Ganta mani aadudhu.mp3",
+        "true_hz": 145.14587,
+        "est_hz": 145.1455156699535
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sanjay at Sastri Hall by Sanjay Subrahmanyan/Innamum Oru thalam/Sanjay Subrahmanyan - Innamum Oru thalam.mp3",
+        "true_hz": 145.986692,
+        "est_hz": 365.74378098084117
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sanjay at Sastri Hall by Sanjay Subrahmanyan/Janani/Sanjay Subrahmanyan - Janani.mp3",
+        "true_hz": 145.986692,
+        "est_hz": 293.66405064874454
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sanjay at Sastri Hall by Sanjay Subrahmanyan/Kalilo Hari Smrana/Sanjay Subrahmanyan - Kalilo Hari Smrana.mp3",
+        "true_hz": 145.14587,
+        "est_hz": 144.30953901491102
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sanjay at Sastri Hall by Sanjay Subrahmanyan/Karupuram Naarumo/Sanjay Subrahmanyan - Karupuram Naarumo.mp3",
+        "true_hz": 145.986692,
+        "est_hz": 257.13036664761506
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sanjay at Sastri Hall by Sanjay Subrahmanyan/Mangalam/Sanjay Subrahmanyan - Mangalam.mp3",
+        "true_hz": 145.14587,
+        "est_hz": 290.291031339907
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sanjay at Sastri Hall by Sanjay Subrahmanyan/Nadopasana/Sanjay Subrahmanyan - Nadopasana.mp3",
+        "true_hz": 145.986692,
+        "est_hz": 146.83202532437227
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sanjay at Sastri Hall by Sanjay Subrahmanyan/Ninnaiye rathi/Sanjay Subrahmanyan - Ninnaiye rathi.mp3",
+        "true_hz": 145.14587,
+        "est_hz": 145.1455156699535
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sanjay at Sastri Hall by Sanjay Subrahmanyan/O Rangashayee/Sanjay Subrahmanyan - O Rangashayee.mp3",
+        "true_hz": 145.986692,
+        "est_hz": 145.1455156699535
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sanjay at Sastri Hall by Sanjay Subrahmanyan/Oorilen Kaani Illai/Sanjay Subrahmanyan - Oorilen Kaani Illai.mp3",
+        "true_hz": 145.14587,
+        "est_hz": 290.291031339907
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sanjay at Sastri Hall by Sanjay Subrahmanyan/Ramakrishnaru Manaegae/Sanjay Subrahmanyan - Ramakrishnaru Manaegae.mp3",
+        "true_hz": 145.14587,
+        "est_hz": 194.86837824034143
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sanjay at Sastri Hall by Sanjay Subrahmanyan/Sama geeta priyan/Sanjay Subrahmanyan - Sama geeta priyan.mp3",
+        "true_hz": 145.986692,
+        "est_hz": 145.1455156699535
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sanjay at Sastri Hall by Sanjay Subrahmanyan/Teerthakarayinile/Sanjay Subrahmanyan - Teerthakarayinile.mp3",
+        "true_hz": 145.14587,
+        "est_hz": 288.61907802982205
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sanjay at Sastri Hall by Sanjay Subrahmanyan/Uppum karpuramum/Sanjay Subrahmanyan - Uppum karpuramum.mp3",
+        "true_hz": 145.14587,
+        "est_hz": 288.61907802982205
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sanjay at Sastri Hall by Sanjay Subrahmanyan/Va vela va/Sanjay Subrahmanyan - Va vela va.mp3",
+        "true_hz": 145.986692,
+        "est_hz": 290.291031339907
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sanjay at Sastri Hall by Sanjay Subrahmanyan/Vanajakshi - Varnam/Sanjay Subrahmanyan - Vanajakshi - Varnam.mp3",
+        "true_hz": 145.986692,
+        "est_hz": 145.1455156699535
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Srividya Janakiraman at Arkay by Srividya Janakiraman/Gnanamosaga Rada/Gnanamosaga Rada.mp3.mp3",
+        "true_hz": 180.771869,
+        "est_hz": 361.5428553564404
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Srividya Janakiraman at Arkay by Srividya Janakiraman/Jaya Jaya Janaki Kantha/Jaya Jaya Janaki Kantha.mp3.mp3",
+        "true_hz": 180.771869,
+        "est_hz": 272.42013390222235
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Srividya Janakiraman at Arkay by Srividya Janakiraman/Nee Sari evvaramma/Nee Sari evvaramma.mp3.mp3",
+        "true_hz": 180.771869,
+        "est_hz": 202.9090669875047
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Srividya Janakiraman at Arkay by Srividya Janakiraman/Nenindal Agaadadu undo/Nenindal Agaadadu undo.mp3.mp3",
+        "true_hz": 180.771869,
+        "est_hz": 200.57845757387344
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Srividya Janakiraman at Arkay by Srividya Janakiraman/Parvathi Ninu Ne Nera Nammithi/Parvathi Ninu Ne Nera Nammithi.mp3.mp3",
+        "true_hz": 180.771869,
+        "est_hz": 272.42013390222235
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Srividya Janakiraman at Arkay by Srividya Janakiraman/Santhamu leka Sowkyamu ledu/Santhamu leka Sowkyamu ledu.mp3.mp3",
+        "true_hz": 180.771869,
+        "est_hz": 363.6372518110237
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Srividya Janakiraman at Arkay by Srividya Janakiraman/Sarasuda Ninne Kori/Sarasuda Ninne Kori.mp3.mp3",
+        "true_hz": 180.771869,
+        "est_hz": 179.73026086889675
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Srividya Janakiraman at Arkay by Srividya Janakiraman/Sri Dundurge Siva Samsaare/Sri Dundurge Siva Samsaare.mp3.mp3",
+        "true_hz": 266.1987,
+        "est_hz": 182.87189049042058
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sumithra Vasudev at Arkay by Sumithra Vasudev/Aaniraimekkani/Aaniraimekkani.mp3.mp3",
+        "true_hz": 191.521124,
+        "est_hz": 383.04131227942946
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sumithra Vasudev at Arkay by Sumithra Vasudev/Karuninchutakidi/Karuninchutakidi.mp3.mp3",
+        "true_hz": 191.521124,
+        "est_hz": 100.28922878693672
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sumithra Vasudev at Arkay by Sumithra Vasudev/Mangalam Kosalendraya/Mangalam Kosalendraya.mp3.mp3",
+        "true_hz": 191.521124,
+        "est_hz": 286.9567544622001
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sumithra Vasudev at Arkay by Sumithra Vasudev/Mati Matiki/Mati Matiki.mp3.mp3",
+        "true_hz": 191.521124,
+        "est_hz": 100.28922878693672
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sumithra Vasudev at Arkay by Sumithra Vasudev/Ramabhi Rama Manasu/Ramabhi Rama Manasu.mp3.mp3",
+        "true_hz": 191.521124,
+        "est_hz": 252.71302085276886
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sumithra Vasudev at Arkay by Sumithra Vasudev/Sri Guru Na Palitosmi/Sri Guru Na Palitosmi.mp3.mp3",
+        "true_hz": 191.521124,
+        "est_hz": 100.28922878693672
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sumithra Vasudev at Arkay by Sumithra Vasudev/Sri Vidhya Rajagopala/Sri Vidhya Rajagopala.mp3.mp3",
+        "true_hz": 191.521124,
+        "est_hz": 100.28922878693672
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sumithra Vasudev at Arkay by Sumithra Vasudev/Thoomani Madatthu/Thoomani Madatthu.mp3.mp3",
+        "true_hz": 191.521124,
+        "est_hz": 100.28922878693672
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sumithra Vasudev at Arkay by Sumithra Vasudev/Va Va Brindavana/Va Va Brindavana.mp3.mp3",
+        "true_hz": 190.418043,
+        "est_hz": 100.28922878693672
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Sumithra Vasudev at Arkay by Sumithra Vasudev/Vanajaksha Ninne Kori/Vanajaksha Ninne Kori.mp3.mp3",
+        "true_hz": 127.088797,
+        "est_hz": 100.28922878693672
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/V Shankarnarayanan at Arkay by V Shankaranarayanan/Ardhanareeshwaram/Ardhanareeshwaram.mp3.mp3",
+        "true_hz": 138.591315,
+        "est_hz": 275.5855033851409
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/V Shankarnarayanan at Arkay by V Shankaranarayanan/Chakkani Raja/Chakkani Raja.mp3.mp3",
+        "true_hz": 138.591315,
+        "est_hz": 137.79275169257048
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/V Shankarnarayanan at Arkay by V Shankaranarayanan/Chenduril Nindradum Kanda/Chenduril Nindradum Kanda.mp3.mp3",
+        "true_hz": 138.591315,
+        "est_hz": 182.87189049042058
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/V Shankarnarayanan at Arkay by V Shankaranarayanan/Dinamani Vamsa/Dinamani Vamsa.mp3.mp3",
+        "true_hz": 138.591315,
+        "est_hz": 137.79275169257048
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/V Shankarnarayanan at Arkay by V Shankaranarayanan/Muruga Muruga Muruga/Muruga Muruga Muruga.mp3.mp3",
+        "true_hz": 138.591315,
+        "est_hz": 137.79275169257048
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/V Shankarnarayanan at Arkay by V Shankaranarayanan/Nera Nammiti/Nera Nammiti.mp3.mp3",
+        "true_hz": 138.591315,
+        "est_hz": 275.5855033851409
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/V Shankarnarayanan at Arkay by V Shankaranarayanan/Ninne Bhajana/Ninne Bhajana.mp3.mp3",
+        "true_hz": 138.591315,
+        "est_hz": 137.79275169257048
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/V Shankarnarayanan at Arkay by V Shankaranarayanan/Pavamana Suthudu Pattu/Pavamana Suthudu Pattu.mp3.mp3",
+        "true_hz": 138.591315,
+        "est_hz": 139.39382634489994
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/V Shankarnarayanan at Arkay by V Shankaranarayanan/Shloka/Shloka.mp3.mp3",
+        "true_hz": 138.591315,
+        "est_hz": 172.60807994544766
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Vasundara Rajagopal at Arkay by Vasundara Rajagopal/Amba Nilambari/Amba Nilambari.mp3.mp3",
+        "true_hz": 170.625924,
+        "est_hz": 212.50547332303054
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Vasundara Rajagopal at Arkay by Vasundara Rajagopal/Avani Sutha/Avani Sutha.mp3.mp3",
+        "true_hz": 170.625924,
+        "est_hz": 300.5281224519437
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Vasundara Rajagopal at Arkay by Vasundara Rajagopal/Chandrashekharam Sada Bhajeham/Chandrashekharam Sada Bhajeham.mp3.mp3",
+        "true_hz": 168.666118,
+        "est_hz": 252.71302085276886
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Vasundara Rajagopal at Arkay by Vasundara Rajagopal/Munnu Ravana/Munnu Ravana.mp3.mp3",
+        "true_hz": 170.625924,
+        "est_hz": 229.0771140413157
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Vasundara Rajagopal at Arkay by Vasundara Rajagopal/Ni Ninaindhal Aagadhadhu/Ni Ninaindhal Aagadhadhu.mp3.mp3",
+        "true_hz": 169.643191,
+        "est_hz": 255.64940471208612
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Vasundara Rajagopal at Arkay by Vasundara Rajagopal/Ninnuvina Marigalada/Ninnuvina Marigalada.mp3.mp3",
+        "true_hz": 170.625924,
+        "est_hz": 200.57845757387344
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Vasundara Rajagopal at Arkay by Vasundara Rajagopal/Pranamamyaham Sri Prananatham/Pranamamyaham Sri Prananatham.mp3.mp3",
+        "true_hz": 170.625924,
+        "est_hz": 343.22786111858994
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Vasundara Rajagopal at Arkay by Vasundara Rajagopal/Shlokham/Shlokham.mp3.mp3",
+        "true_hz": 170.625924,
+        "est_hz": 257.13036664761506
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Vasundara Rajagopal at Arkay by Vasundara Rajagopal/Sri Jalandara/Sri Jalandara.mp3.mp3",
+        "true_hz": 169.643191,
+        "est_hz": 257.13036664761506
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Vignesh Ishwar at Nada Inbam by Vignesh Ishwar/Amba Kamakshi/Vignesh Ishwar - Amba Kamakshi.mp3",
+        "true_hz": 146.832384,
+        "est_hz": 221.27390657776664
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Vignesh Ishwar at Nada Inbam by Vignesh Ishwar/Evvari Bodhana/Vignesh Ishwar - Evvari Bodhana.mp3",
+        "true_hz": 147.682975,
+        "est_hz": 147.68261459394992
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Vignesh Ishwar at Nada Inbam by Vignesh Ishwar/Gopanandana/Vignesh Ishwar - Gopanandana.mp3",
+        "true_hz": 221.274447,
+        "est_hz": 147.68261459394992
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Vignesh Ishwar at Nada Inbam by Vignesh Ishwar/Hiranmayeem Lakshmeem/Vignesh Ishwar - Hiranmayeem Lakshmeem.mp3",
+        "true_hz": 147.682975,
+        "est_hz": 147.68261459394992
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Vignesh Ishwar at Nada Inbam by Vignesh Ishwar/Idhuthaano Thillai Sthalam/Vignesh Ishwar - Idhuthaano Thillai Sthalam.mp3",
+        "true_hz": 146.832384,
+        "est_hz": 295.36522918789984
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Vignesh Ishwar at Nada Inbam by Vignesh Ishwar/Karuna Ela Gante/Vignesh Ishwar - Karuna Ela Gante.mp3",
+        "true_hz": 147.682975,
+        "est_hz": 295.36522918789984
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Vignesh Ishwar at Nada Inbam by Vignesh Ishwar/Lokavana Chatura/Vignesh Ishwar - Lokavana Chatura.mp3",
+        "true_hz": 147.682975,
+        "est_hz": 295.36522918789984
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Vignesh Ishwar at Nada Inbam by Vignesh Ishwar/Niraimadi Mugam Thiruppugazh/Vignesh Ishwar - Niraimadi Mugam Thiruppugazh.mp3",
+        "true_hz": 147.682975,
+        "est_hz": 147.68261459394992
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Vignesh Ishwar at Nada Inbam by Vignesh Ishwar/Pavamana Suthudu Mangalam/Vignesh Ishwar - Pavamana Suthudu Mangalam.mp3",
+        "true_hz": 147.682975,
+        "est_hz": 295.36522918789984
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Vignesh Ishwar at Nada Inbam by Vignesh Ishwar/Sanchara Dhadhara/Vignesh Ishwar - Sanchara Dhadhara.mp3",
+        "true_hz": 195.997718,
+        "est_hz": 295.36522918789984
+      },
+      {
+        "audio": "/home/tejas-agarwal/Programming/AI/Indian_Musicology_Gradient/data/saraga/saraga1.5_carnatic/Vignesh Ishwar at Nada Inbam by Vignesh Ishwar/Vitthala Salaho Swamy/Vignesh Ishwar - Vitthala Salaho Swamy.mp3",
+        "true_hz": 146.832384,
+        "est_hz": 221.27390657776664
+      }
     ]
   }
 }

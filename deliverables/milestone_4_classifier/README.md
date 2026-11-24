@@ -11,6 +11,8 @@ separated stems, showing that cross-instrument bleed was removed.
   split), `history.json` and `train_classifier.log`.
 * `sanidha_only/`: the same evaluation with an earlier classifier trained on
   Sanidha alone, kept for comparison (see the end of this file).
+* `saraga/`: the live-bleed version of this test, on all 168 Saraga
+  recordings. It has its own README.
 
 ## Method
 
@@ -162,9 +164,11 @@ so bleed is penalised harder, and the separated stems still hold up.
 ## Caveats
 
 * **This is not the live-bleed test.** Sanidha's mixture is the sum of
-  near-bleed-free close mics. The real-world version is Saraga, whose close
-  mics themselves leak. It needs a different rule for choosing "instrument is
-  playing" windows, because Saraga has no clean reference. Not done yet.
+  near-bleed-free close mics. The live version is in `saraga/`. There,
+  separated stems reach 86.3% balanced accuracy (vocal, violin, mridangam)
+  against 60.0% for the live close mics and 16.0% for the mixture. For vocal
+  and violin the gain is bleed removal. For mridangam it is mostly a
+  recording-domain effect, and ghatam cannot be tested there.
 * **Concert03 is not perfectly untouched for the separator.** The separator
   never trained on it, but its `best.pt` epoch was *selected* by validation SDR
   on Concert03, which flatters the separated column slightly. The classifier
