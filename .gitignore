@@ -12,3 +12,4 @@ checkpoints/
 *.log
 *.pt
 dist/
+.claude

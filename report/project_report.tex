@@ -35,221 +35,184 @@
   \begin{minipage}{0.85\textwidth}
     \small
     \centerline{\bfseries Abstract}\vspace{0.5ex}
-    Music demixing models are trained on Western multitracks and fail on Hindustani and
-    Carnatic ensembles: they hear tabla and mridangam as generic drums, they cannot track
+    Music demixing models are trained on Western multitracks and fail on Carnatic and
+    Hindustani ensembles: they hear mridangam and tabla as generic drums, they cannot track
     the microtonal glides of an Indian melodic line, and live concert recording adds
-    microphone bleed that no frequency filter can undo. We build a four-stage pipeline:
-    a domain-tuned harmonic/percussive front end, an HTDemucs backbone re-headed for
-    \emph{vocal / violin / mridangam / ghatam} and fine-tuned on studio Carnatic
-    multitracks with simulated bleed, mask-based waveform resynthesis, and an MFCC CNN
-    timbre classifier used as a bleed metric. We reach 8.89\,dB SDR on held-out studio
-    audio and 3.44\,dB on 168 unseen \emph{live} multitracks, 7--9\,dB above the HPSS
-    baseline. Because live references themselves contain bleed, SDR cannot see bleed
-    removal; the classifier can, scoring separated live stems at 86.3\,\% balanced
-    accuracy against 60.0\,\% for the close mics they came from.
+    microphone bleed that no frequency filter can undo. We build a four-stage pipeline: a
+    domain-tuned harmonic/percussive front end, an HTDemucs backbone re-headed for
+    \emph{vocal / violin / mridangam / ghatam} and fine-tuned on studio Carnatic multitracks
+    with simulated bleed, mask-based resynthesis, and an MFCC CNN timbre classifier used as a
+    bleed metric. We reach 8.89\,dB SDR on held-out studio audio and 3.44\,dB on 168 unseen
+    \emph{live} multitracks, 7--9\,dB above the HPSS baseline. Because live references
+    themselves contain bleed, SDR cannot see bleed removal; the classifier can, scoring
+    separated live stems at 86.3\,\% balanced accuracy against 60.0\,\% for the close mics
+    they came from.
   \end{minipage}
 \end{center}
 \vspace{1.5ex}
 }]
 
 \section{Introduction}
-Source separation is mature for Western popular music and essentially untested on Indian
-art music. The gap is structural, not a matter of scale. The percussion is tonal: a
-mridangam or tabla is tuned to the tonic and its strokes carry pitch, so a model whose
-percussive class came from kick drums assigns that energy wherever it finds a transient.
-The melody is built from \emph{gamaka}, continuous ornamental glides, so the
-near-horizontal spectral ridges that Western models use to recognise sustained notes are
-not there. And the repertoire is recorded live, with the ensemble in one room and one
-close microphone per instrument, so every ``isolated'' track already contains the others
-at $-20$ to $-10$\,dB. That last problem is the one practitioners want solved, and it is
-also what makes the standard metric useless: if the reference stem contains bleed, a
-separator that removes the bleed is penalised for it.
+Source separation is mature for Western popular music and essentially untested on Indian art
+music. The gap is structural, not a matter of scale. The percussion is tonal: a mridangam is
+tuned to the tonic and its strokes carry pitch, so a model whose percussive class came from
+kick drums assigns that energy wherever it finds a transient. The melody is built from
+\emph{gamaka}, continuous ornamental glides, so the near-horizontal spectral ridges Western
+models use to recognise sustained notes are absent. And the repertoire is recorded live, one
+close microphone per instrument in a shared room, so every ``isolated'' track already contains
+the others at $-20$ to $-10$\,dB. That last problem is the one practitioners want solved, and
+it also makes the standard metric useless: if the reference stem contains bleed, a separator
+that removes the bleed is penalised for it.
 
-\textbf{Input and output.} The system takes one polyphonic recording (44.1\,kHz WAV, a mix
-or the sum of close mics) and returns four waveform stems --- vocal, violin, mridangam,
-ghatam --- plus, from the classifier, a per-second label with a distribution over 13
-instruments.
-
-\textbf{Contributions.} (i) A hand-written harmonic/percussive front end with physically
-specified kernels tuned on Carnatic audio, explicit tonic estimation, and a measured
-baseline; (ii) an HTDemucs backbone re-headed for Indian instrument categories and
-fine-tuned on bleed-free studio multitracks with \emph{simulated} bleed, which transfers
-to live audio it never saw; (iii) a controlled comparison of mask-based resynthesis
-against Griffin--Lim, a pretrained neural vocoder and an oracle mask; and (iv) a
-classifier-based bleed metric that answers the question SDR cannot answer on live
-recordings, validated against a simulated-bleed control so we know the metric is actually
-sensitive to leakage.
+The system takes one polyphonic recording (44.1\,kHz, a mix or the sum of close mics) and
+returns four waveform stems --- vocal, violin, mridangam, ghatam --- plus a per-second label
+over 13 instruments. We contribute (i) a harmonic/percussive front end with physically
+specified kernels tuned on Carnatic audio and a measured baseline; (ii) an HTDemucs backbone
+re-headed for Indian categories and fine-tuned on bleed-free studio audio with \emph{simulated}
+bleed, which transfers to live audio it never saw; (iii) a comparison of mask-based resynthesis
+against Griffin--Lim, a neural vocoder and an oracle mask; and (iv) a classifier-based bleed
+metric, validated against a simulated-bleed control so we know it is sensitive to leakage at
+all.
 
 \section{Background and related work}
-Median filtering a magnitude spectrogram along time isolates pitched structure and along
-frequency isolates transients, giving a cheap unsupervised split~\cite{fitzgerald2010hpss}.
-It is our baseline and our front end, but it is a signal-processing prior, not an
-instrument model: it cannot tell a violin from a voice. Learned demixing moved from
+Median filtering a spectrogram along time isolates pitched structure and along frequency
+isolates transients, a cheap unsupervised split~\cite{fitzgerald2010hpss}: our baseline and
+front end, but a signal-processing prior, not an instrument model. Learned demixing moved from
 mask-predicting U-Nets~\cite{hennequin2020spleeter} to hybrid time/spectral transformers
-(HTDemucs~\cite{rouard2023htdemucs}), all trained on MUSDB-style \emph{drums / bass / other
-/ vocals} stems. We fine-tune rather than train from scratch: 37 studio tracks cannot
-support a demixing model, and the pretrained encoders already hold a usable
-voice/melody/percussion split we can re-target.
+(HTDemucs~\cite{rouard2023htdemucs}), all trained on MUSDB-style \emph{drums / bass / other /
+vocals} stems. We fine-tune rather than train from scratch: 37 studio tracks cannot support a
+demixing model, and the pretrained encoders already hold a usable voice/melody/percussion split
+to re-target.
 
-BSS-Eval decomposes an estimate into target, interference and artefact energy, giving SDR,
-SIR and SAR~\cite{vincent2006bss}; SI-SDR removes the scale ambiguity~\cite{leroux2019sisdr}.
-All compare estimate to reference \emph{sample by sample}, so they are blind to phase-free
-reconstructions and, critically here, cannot reward bleed removal when the reference is a
-bled close mic. Using a downstream classifier as the metric instead is the standard escape
-from exactly this situation, and is what Milestone~4 does. For resynthesis, mask $\times$
-mixture STFT with the mixture's phase is the usual choice; Griffin--Lim rebuilds phase from
-magnitude alone~\cite{griffin1984}, and neural vocoders such as
-BigVGAN~\cite{lee2023bigvgan} generate a waveform from a mel spectrogram. We test all
-three. On the Indian-music side, the Saraga corpora~\cite{srinivasamurthy2021saraga} supply
-annotated live Carnatic audio and tonic annotations, while Sanidha~\cite{sanidha2025}
-supplies studio multitracks recorded with the artists in separate booths, which is what
-makes supervised training possible at all. MFCCs with a small 2-D CNN remain a strong,
-data-efficient instrument classifier, and that is the design used for the bleed metric.
-General AI background follows Russell and Norvig~\cite{russell2021aima}.
+BSS-Eval splits an estimate into target, interference and artefact energy, giving SDR, SIR and
+SAR~\cite{vincent2006bss}; SI-SDR removes the scale ambiguity~\cite{leroux2019sisdr}. All
+compare estimate to reference \emph{sample by sample}, so they are blind to phase-free
+reconstructions and cannot reward bleed removal when the reference is a bled close mic.
+Substituting a downstream classifier is the standard escape, and is what Milestone~4 does.
+Griffin--Lim rebuilds phase from magnitude alone~\cite{griffin1984}, and neural vocoders such as
+BigVGAN~\cite{lee2023bigvgan} generate a waveform from a mel spectrogram; we test both against
+mixture-phase masking. Saraga~\cite{srinivasamurthy2021saraga} supplies annotated live Carnatic
+audio, and Sanidha~\cite{sanidha2025} studio multitracks recorded with the artists in separate
+booths, which makes supervised training possible at all. General background
+follows~\cite{russell2021aima}.
 
 \section{Method}
-\subsection{Front end (Milestone 1)}
-One \texttt{STFTConfig} (44.1\,kHz, $n_\text{fft}{=}2048$, hop 512, Hann) is threaded
-through analysis, masking and synthesis, since an analysis/synthesis window mismatch is the
-commonest silent failure in such a pipeline; the complex spectrogram is kept, not just the
-magnitude, because resynthesis needs the mixture phase. HPSS is written directly rather
-than taken from a library so the kernels can be given in \emph{physical} units --- a time
-kernel in milliseconds, a frequency kernel in hertz, converted to frames and bins at run
-time --- and stay meaningful across sample rates. With $H,P$ the median-filtered magnitudes
-and power $p{=}2$, a bin is assigned by the soft masks
+\subsection{Front end}
+One \texttt{STFTConfig} (44.1\,kHz, $n_\text{fft}{=}2048$, hop 512, Hann) is threaded through
+analysis, masking and synthesis, since a window mismatch between them is the commonest silent
+failure in such a pipeline; the complex spectrogram is kept, because resynthesis needs the
+mixture phase. HPSS is written directly rather than taken from a library so the kernels can be
+given in \emph{physical} units --- milliseconds and hertz, converted to frames and bins at run
+time --- and stay meaningful across sample rates. With $H,P$ the median-filtered magnitudes and
+power $p{=}2$, a bin is assigned by the soft masks
 \begin{equation}
 M_H=\frac{H^{p}}{H^{p}+P^{p}},\qquad M_P=\frac{P^{p}}{H^{p}+P^{p}},
 \end{equation}
-and with margin $m>1$ any bin satisfying neither $H^{p}>m\,P^{p}$ nor $P^{p}>m\,H^{p}$ goes
-to a third \emph{residual} output. That matters here: ghatam strokes and veena plucks are
-neither clearly harmonic nor clearly percussive, and forcing them into the harmonic stem is
-what makes naive HPSS sound wrong on this repertoire. Indian art music has no fixed
-reference pitch --- each performance picks its own Sa --- so tonic handling is explicit:
-\texttt{dsp/tonic.py} folds a pitch-salience histogram into one octave and takes the modal
-pitch class, exploiting the fact that the drone makes Sa the most occupied class, then
-either shifts to a canonical Sa or records the estimate alongside the arrays.
+and with margin $m>1$ any bin satisfying neither $H^{p}>m\,P^{p}$ nor $P^{p}>m\,H^{p}$ goes to a
+third \emph{residual} output. Ghatam strokes and veena plucks are neither clearly harmonic nor
+clearly percussive, and forcing them into the harmonic stem is what makes naive HPSS sound wrong
+here. Tonic handling is explicit because the music has no fixed reference pitch: we fold a
+pitch-salience histogram into one octave and take the modal class, exploiting the fact that the
+drone makes Sa the most occupied one.
 
-\subsection{Separator (Milestone 2)}
-HTDemucs's four-way output head is rebuilt for \emph{vocal / violin / mridangam / ghatam},
-each new source initialised from the closest Western one
-(\texttt{vocal}$\leftarrow$\texttt{vocals}, \texttt{violin}$\leftarrow$\texttt{other},
-\texttt{mridangam},\,\texttt{ghatam}$\leftarrow$\texttt{drums}), so training starts from a
-model that already splits voice, melody and percussion. Fine-tuning is two-phase and
-parameter-efficient: phase~1 trains only the new head, phase~2 unfreezes the decoders and
-transformer at a $10\times$ lower rate, and both encoders stay frozen throughout.
+\subsection{Separator}
+HTDemucs's four-way head is rebuilt for \emph{vocal / violin / mridangam / ghatam}, each new
+source initialised from the closest Western one (\texttt{vocal}$\leftarrow$\texttt{vocals},
+\texttt{violin}$\leftarrow$\texttt{other},
+\texttt{mridangam},\,\texttt{ghatam}$\leftarrow$\texttt{drums}), so training starts from a model
+that already splits voice, melody and percussion. Phase~1 trains only the new head; phase~2
+unfreezes the decoders and transformer at a $10\times$ lower rate; both encoders stay frozen.
 
-The decisive augmentation is \textbf{simulated bleed}, the bridge from studio training data
-to live test data: each source is convolved with a short random room response and leaked
-into the other instruments' microphones at $-30$ to $-12$\,dB, and \emph{every leaked copy
-keeps the label of the instrument that produced it}, so the masks learn to follow the
-instrument rather than the microphone. Lesser augmentations are per-stem gain, one pitch
-shift shared across a track's stems (the ensemble stays in tune with itself), and stems
-shuffled across tracks. Training does not tonic-normalise whole tracks; the shared $\pm2$
-semitone shift covers tonic variation and inference runs on raw audio. Two choices keep the
-numbers honest: splits are by \emph{concert}, never by track or segment, because songs from
-one concert share performers, room and mics and alternate takes are near-duplicates; and
-checkpoints are selected by mean validation SDR, never training loss, with SDR logged per
-stem.
+The decisive augmentation is \textbf{simulated bleed}, the bridge from studio training data to
+live test data: each source is convolved with a short random room response and leaked into the
+other microphones at $-30$ to $-12$\,dB, and \emph{every leaked copy keeps the label of the
+instrument that produced it}, so the masks learn to follow the instrument rather than the
+microphone. We also apply per-stem gain and one pitch shift shared across a track's stems, which
+covers tonic variation without normalising whole tracks. Two choices keep the numbers honest:
+splits are by \emph{concert}, never by track or segment, since songs from one concert share
+performers, room and mics and alternate takes are near-duplicates; and checkpoints are selected
+by mean validation SDR, never training loss.
 
-\subsection{Resynthesis (Milestone 3)}
-The deliverable path is mask $\times$ mixture STFT followed by ISTFT; because the masks sum
-to one over sources in every bin, the stems add back to the mixture sample for sample. We
-compare it with HTDemucs's own direct waveform output, fast Griffin--Lim (32 iterations,
-from random and from mixture phase), a pretrained BigVGAN v2 vocoder
-(\texttt{nvidia/bigvgan\_v2\_44khz\_128band\_512x}, 122\,M parameters, no fine-tuning,
-running natively on the pipeline's 44.1\,kHz / hop-512 grid), and an \emph{oracle}
-ideal-ratio mask from the references, the ceiling for mixture-phase masking. Alongside
-BSS-Eval we report a phase-blind magnitude SNR, the only fair column for methods that
-invent their own phase.
+\subsection{Resynthesis}
+The deliverable path is mask $\times$ mixture STFT then ISTFT; because the masks sum to one over
+sources in every bin, the stems add back to the mixture sample for sample. We compare it with
+HTDemucs's direct waveform output, fast Griffin--Lim (32 iterations, from random and from mixture
+phase), a pretrained BigVGAN v2 vocoder (122\,M parameters, no fine-tuning, running natively on
+the pipeline's 44.1\,kHz / hop-512 grid), and an \emph{oracle} ideal-ratio mask, the ceiling for
+mixture-phase masking. Alongside BSS-Eval we report a phase-blind magnitude SNR, the only fair
+column for methods that invent their own phase.
 
-\subsection{Bleed metric (Milestone 4)}
-Audio is cut into 1\,s windows at a 0.5\,s hop at 22.05\,kHz; each window is 40 MFCCs with
-deltas and delta-deltas, a $120\times86$ patch, mel bands capped at 8\,kHz because one
-corpus class ships at 16\,kHz and a CNN would otherwise learn sample rate instead of
-timbre. Windows below $-50$\,dBFS, or more than 30\,dB under the recording's own loud
-level, are dropped: a separated stem is mostly silence where its instrument is not playing,
-and keeping those windows lets the classifier score well by learning ``silence
-$\Rightarrow$ whichever stem is usually quiet'', which would invalidate the whole argument.
-The model is a 4-block 2-D CNN with global average pooling, 99\,k parameters, trained with
-class-weighted cross-entropy, an equal window budget per class and a random $\pm6$\,dB
-level shift on $c_0$ so recording level is not a cue.
+\subsection{Bleed metric}
+Audio is cut into 1\,s windows at a 0.5\,s hop at 22.05\,kHz, each 40 MFCCs with deltas and
+delta-deltas ($120\times86$), mel bands capped at 8\,kHz because one corpus class ships at
+16\,kHz and a CNN would otherwise learn sample rate instead of timbre. Silent windows are
+dropped: a separated stem is mostly silence where its instrument is not playing, and keeping
+those windows lets the classifier score well by learning ``silence $\Rightarrow$ whichever stem
+is usually quiet''. The model is a 4-block 2-D CNN with global average pooling, 99\,k parameters,
+trained with class-weighted cross-entropy, an equal window budget per class and a random
+$\pm6$\,dB level shift so recording level is not a cue.
 
-On studio audio the conditions are the clean close-mic stem (the classifier's ceiling), the
-separated stem, a \emph{control} of the clean stem with every other instrument added 12\,dB
-down, and the full mixture (the floor). The control is what makes the comparison mean
-anything: a classifier deaf to bleed would score a leaky stem like a clean one. Live audio
-has no clean reference, and a silent instrument's close mic is still loud whenever the
-ensemble plays, so windows are chosen by a \textbf{bleed-floor rule}: for each mic and
-window take the ratio of that mic's energy to the energy on all other mics; the mic's bleed
-floor is the 5th percentile of that ratio pooled over the concert, where the instrument
-rests and only leakage remains; a window counts as playing when the ratio is $\geq10$\,dB
-above the floor. Leaking every Sanidha mic pair through random room responses and scoring
-the rule against clean-stem windows gives precision 0.99--1.00 for vocal, violin and
-mridangam, with the instrument supplying more than half its own mic's energy in over 95\,\%
-of kept windows. For ghatam precision falls to 0.75--0.87 and bleed outweighs the
-instrument in 30--73\,\% of kept windows, so ghatam is reported but not interpreted on live
-audio.
+On studio audio the conditions are the clean close-mic stem (the ceiling), the separated stem, a
+\emph{control} of the clean stem with every other instrument added 12\,dB down, and the mixture
+(the floor). The control is what makes the comparison mean anything: a classifier deaf to bleed
+would score a leaky stem like a clean one. Live audio has no clean reference, and a silent
+instrument's mic is still loud whenever the ensemble plays, so windows are chosen by a
+\textbf{bleed-floor rule}: take each mic's energy relative to all the others; its bleed floor is
+the 5th percentile of that ratio pooled over the concert, where the instrument rests and only
+leakage remains; a window counts as playing at $\geq10$\,dB above the floor. Leaking every
+Sanidha mic pair through random room responses and scoring the rule against clean-stem windows
+gives precision 0.99--1.00 for vocal, violin and mridangam. For ghatam it falls to 0.75--0.87, so
+ghatam is reported but not interpreted on live audio.
 
 \section{Experimental setup}
-\textbf{Sanidha} (studio Carnatic multitrack, artists in isolation booths, near-zero bleed)
-is the only training corpus: 37 tracks over 5 concerts, with \emph{Concert03} (6 tracks,
-82\,min) held out whole. Training on clean stems is deliberate --- training on live audio
-would teach the model that leakage belongs in the target. \textbf{Saraga 1.5 Carnatic} is
-test-only: 168 of its 249 recordings ship multitrack stems, recorded live at one venue with
-real bleed on every mic, and ghatam has its own mic on only 46, so three- and four-stem
-means are quoted over their own track sets and never merged. Its released stereo master is
-\emph{not} the sum of the close mics --- we measured per-track offsets of 36--311 samples,
-with about half the tracks polarity-inverted --- so BSS-Eval's alignment assumption fails on
-it; we score a linear remix of the close mics, which keeps all the live bleed. The
-Hindustani release is mixture-only and cannot yield a separation metric at all.
+\textbf{Sanidha} (studio Carnatic multitrack, artists in isolation booths, near-zero bleed) is
+the only training corpus: 37 tracks over 5 concerts, with \emph{Concert03} (6 tracks, 82\,min)
+held out whole. Training on clean stems is deliberate --- training on live audio would teach the
+model that leakage belongs in the target. \textbf{Saraga 1.5 Carnatic} is test-only: 168
+recordings ship multitrack stems, recorded live at one venue with real bleed on every mic, and
+only 46 have a ghatam mic, so three- and four-stem means are quoted over their own track sets and
+never merged. Its stereo master is \emph{not} the sum of the close mics (offsets of 36--311
+samples, about half the tracks polarity-inverted), so we score a linear remix of the mics, which
+keeps all the live bleed. \textbf{IMIDataset} trains the classifier only, after repair: part
+\texttt{Imid-06} duplicates \texttt{Imid-02}, leaving \textbf{8628 distinct clips
+($\approx$13.8\,h)}, not the 33\,h usually quoted, and its clips are consecutive excerpts, so
+splits are by block of 100 clip numbers. It has no voice, mridangam or ghatam class --- three of
+our four stems --- so Sanidha supplies those, giving 13 classes (chance 7.7\,\%) in which a
+mridangam stem that ``sounds like tabla'' is reported as exactly that.
 
-\textbf{IMIDataset} trains the classifier only, and the shipped release needed repair: part
-\texttt{Imid-06} is a byte-identical copy of \texttt{Imid-02} and ten further clips are
-duplicated, leaving \textbf{8628 distinct clips ($\approx$13.8\,h)}, not the 33\,h usually
-quoted. Its clips are consecutive excerpts of longer recordings, so splits are by block of
-100 consecutive clip numbers rather than by clip. It has no voice, mridangam or ghatam class
---- three of our four stems --- so Sanidha's clean stems supply those, giving a 13-class
-problem (chance 7.7\,\%) in which a mridangam stem that ``sounds like tabla'' is reported as
-exactly that.
-
-\textbf{Metrics} are SDR / SIR / SAR / SI-SDR plus a phase-blind magnitude SNR for
-separation and resynthesis, and balanced accuracy plus \emph{bleed mass} (the mean
-probability assigned to any class other than the true one) for the bleed test; bleed mass is
-the more sensitive of the two because it does not need the leakage to win the vote.
-\textbf{Software:} Python 3.14, PyTorch 2.11, librosa, on one 8\,GB consumer GPU.
-\texttt{compIAM}'s trained tonic models could not be used: release 0.4.1 pins
-\texttt{numpy<=1.26.4} and \texttt{torch==2.0.0}, which cannot coexist with this
-environment. Everything in \texttt{tests/} runs without any dataset.
+\textbf{Metrics} are SDR / SIR / SAR / SI-SDR plus a phase-blind magnitude SNR, and balanced
+accuracy plus \emph{bleed mass} (mean probability on any class but the true one), which is more
+sensitive because it does not need the leakage to win the vote. \textbf{Software:} Python 3.14,
+PyTorch 2.11, librosa, one 8\,GB consumer GPU. \texttt{compIAM}'s trained tonic models could not
+be used: release 0.4.1 pins \texttt{numpy<=1.26.4} and \texttt{torch==2.0.0}, incompatible with
+this environment.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{m1_hpss_spectrograms.png}
-\caption{Milestone 1 front end on 10\,s of Carnatic ensemble audio: mixture, melodic
-(harmonic) and percussive magnitude spectrograms from the hand-written HPSS filter at the
-configured kernels (200\,ms, 500\,Hz).}
+\caption{Front end on 10\,s of Carnatic ensemble audio: mixture, melodic and percussive
+magnitude spectrograms, hand-written HPSS at the configured kernels (200\,ms, 500\,Hz).}
 \label{fig:hpss}
 \end{figure}
 
 \section{Results}
-\textbf{Front end.} Over all 37 Sanidha tracks (60\,s each) HPSS reaches 6.84\,dB SDR on
-the melodic stem but $-1.28$\,dB on the percussive stem --- the baseline Milestone 2 must
-beat (Fig.~\ref{fig:hpss}). A $5\times5$ kernel sweep on Concert03 shows the choice is
-domain-specific and matters: the configured 200\,ms / 500\,Hz kernels give 5.07\,dB mean
-SDR, the best cell (200\,ms / 1000\,Hz) 5.55\,dB, and a 50\,ms time kernel loses up to
-3.4\,dB because a kernel that short cannot tell a sustained note from a stroke. Tonic
-estimation is the weakest component: on the 197 annotated Saraga recordings it lands within
-50 cents only 34.5\,\% of the time (median error 10 cents when correct), with 20.3\,\% of
-cases taking Pa for Sa and 10.2\,\% taking Ma, consistent with a full-mix pitch histogram
-dominated by the melody rather than the drone.
+\textbf{Front end.} Over all 37 Sanidha tracks HPSS reaches 6.84\,dB SDR on the melodic stem but
+$-1.28$\,dB on the percussive one --- the baseline Milestone 2 must beat (Fig.~\ref{fig:hpss}). A
+$5\times5$ kernel sweep on Concert03 shows the choice is domain-specific: the configured 200\,ms /
+500\,Hz kernels give 5.07\,dB mean SDR, the best cell 5.55\,dB, and a 50\,ms time kernel loses up
+to 3.4\,dB because a kernel that short cannot tell a sustained note from a stroke. Tonic
+estimation is the weakest component: on 197 annotated Saraga recordings it lands within 50 cents
+only 34.5\,\% of the time (median error 10 cents when correct), with 20.3\,\% taking Pa for Sa and
+10.2\,\% taking Ma --- consistent with a full-mix pitch histogram dominated by the melody rather
+than the drone.
 
-\textbf{Separation} (Table~\ref{tab:results}). Fine-tuning beats the signal-processing
-baseline by 7--9\,dB on live recordings it never saw, but studio-to-live transfer costs
-about 5\,dB and is very uneven: on Saraga, vocal 4.21\,dB, mridangam 4.83\,dB (median
-8.68\,dB), violin 1.27\,dB with 41\,\% of tracks below 0\,dB, ghatam $-8.47$\,dB. The
-mridangam mean is dragged down by free-rhythm pieces (shlokas, viruttams) with no
-percussion at all: its mic then holds only vocal and violin bleed, that bleed is scored as
-the reference, and the model is penalised for correctly staying silent --- which is why its
-median sits 3.9\,dB above its mean.
+\textbf{Separation} (Table~\ref{tab:results}). Fine-tuning beats the baseline by 7--9\,dB on live
+recordings it never saw, but studio-to-live transfer costs about 5\,dB and is uneven: vocal
+4.21\,dB, mridangam 4.83\,dB (median 8.68), violin 1.27\,dB with 41\,\% of tracks below 0\,dB,
+ghatam $-8.47$\,dB. The mridangam mean is dragged down by free-rhythm pieces with no percussion:
+its mic then holds only vocal and violin bleed, that bleed is scored as the reference, and the
+model is penalised for correctly staying silent --- which is why its median sits 3.9\,dB above its
+mean.
 
 \begin{table}[h]
 \centering
@@ -263,25 +226,22 @@ Ours (re-headed HTDemucs) & \textbf{8.89} & \textbf{3.44} \\
 \bottomrule
 \end{tabular}
 \caption{Main results. Mean SDR in dB, higher is better. ``Studio'' is the four-stem mean on
-held-out Sanidha Concert03; ``Live'' is the three-stem mean (vocal, violin, mridangam) over
-all 168 unseen Saraga live multitracks. HPSS cannot name instruments, so its columns are the
-melodic and percussive groupings of the same stems on the same tracks.}
+held-out Concert03, ``Live'' the three-stem mean over 168 unseen Saraga live multitracks. HPSS
+cannot name instruments, so its columns group the same stems as melodic and percussive.}
 \label{tab:results}
 \end{table}
 
-\textbf{Resynthesis} (Table~\ref{tab:resynth}). Mixture-phase ISTFT costs 0.8\,dB SDR
-against HTDemucs's direct output, the price of converting directly predicted estimates into
-a ratio mask: wherever two instruments share a bin both get the mixture's phase, and vocal
-and violin share the raga and often the octave. The oracle mask sits only 1.3--1.6\,dB above
-the predicted one on vocal, violin and mridangam but 3.0\,dB above it on ghatam, the stem
-with the least training data --- better masks would help ghatam most, while for the melodic
-stems the next gain must come from phase. Griffin--Lim from random phase recovers the
-\emph{spectrum} almost perfectly (10.68 vs 10.78\,dB magnitude SNR) yet scores about
-$-31$\,dB SDR, because BSS-Eval needs sample-level phase agreement: the metric/perception gap
-in its most extreme form. The pretrained vocoder is the weakest method even on the
-phase-blind column, and a copy-synthesis check explains why --- vocoding a \emph{clean}
-reference stem with an all-ones mask already matches its own input only to 11.5--15.1\,dB, so
-BigVGAN adds its own spectral error on top of the mask's.
+\textbf{Resynthesis} (Table~\ref{tab:resynth}). Mixture-phase ISTFT costs 0.8\,dB SDR against the
+direct output, the price of turning directly predicted estimates into a ratio mask: where two
+instruments share a bin both get the mixture's phase, and vocal and violin share the raga and
+often the octave. The oracle mask sits 1.3--1.6\,dB above the predicted one on vocal, violin and
+mridangam but 3.0\,dB above it on ghatam, the stem with the least training data --- better masks
+would help ghatam most, while for the melodic stems the next gain must come from phase.
+Griffin--Lim from random phase recovers the \emph{spectrum} almost perfectly (10.68 vs 10.78\,dB
+magnitude SNR) yet scores about $-31$\,dB SDR, since BSS-Eval needs sample-level phase agreement:
+the metric/perception gap in its most extreme form. The vocoder is weakest even on the
+phase-blind column, and a copy-synthesis check explains why --- vocoding a \emph{clean} stem with
+an all-ones mask already matches its own input only to 11.5--15.1\,dB.
 
 \begin{table}[h]
 \centering
@@ -299,18 +259,17 @@ Oracle mask (ceiling) & 9.90 & 13.20 \\
 \bottomrule
 \end{tabular}
 \caption{Resynthesis on held-out Concert03, mean over the four stems, dB, higher is better.
-Magnitude SNR is phase-blind and is the fair column for the phase-reconstructing methods.}
+Magnitude SNR is phase-blind, the fair column for phase-reconstructing methods.}
 \label{tab:resynth}
 \end{table}
 
-\textbf{Bleed removal} (Table~\ref{tab:bleed}) is the result the project is really about. On
-studio audio separated stems classify essentially like clean ones (94.8 vs 95.7\,\% balanced
-accuracy, within 1.6 points on every track) while the same classifier on the $-12$\,dB
-control collapses to 52.1\,\%: as far as timbre is concerned, the leakage left in the
-separated stems is well below $-12$\,dB. Bleed mass says the same more sharply, and an
+\textbf{Bleed removal} (Table~\ref{tab:bleed}) is what the project is really about. On studio
+audio separated stems classify essentially like clean ones (94.8 vs 95.7\,\%, within 1.6 points on
+every track) while the same classifier on the $-12$\,dB control collapses to 52.1\,\%: as far as
+timbre is concerned, the leakage left in the separated stems is well below $-12$\,dB. An
 in-domain check on held-out IMIDataset clips (97.6\,\%) confirms the measuring instrument is
-sound. On \emph{live} audio the separated stems beat the close microphones they were computed
-from, 86.3 vs 60.0\,\%, on 85--100\,\% of individual tracks.
+sound. On \emph{live} audio separated stems beat the close microphones they were computed from,
+86.3 vs 60.0\,\%, on 85--100\,\% of individual tracks.
 
 \begin{table}[h]
 \centering
@@ -325,72 +284,59 @@ Live (Saraga, 3 stems) & 60.0 & \textbf{86.3} & --- & 16.0 \\
 \quad bleed mass & 0.42 & 0.16 & --- & 0.84 \\
 \bottomrule
 \end{tabular}
-\caption{Bleed metric: balanced accuracy (\%) over 13 classes, higher is better, and bleed
-mass, lower is better. Studio columns are clean stem / separated / clean $+$ others at
-$-12$\,dB / mixture; live columns are live close mic / separated / --- / sum of close mics.
-Chance is 7.7\,\%.}
+\caption{Bleed metric: balanced accuracy (\%), higher is better, and bleed mass, lower is better,
+over 13 classes. Studio columns are clean stem / separated / clean $+$ others at $-12$\,dB /
+mixture; live columns are close mic / separated / --- / sum of mics. Chance is 7.7\,\%.}
 \label{tab:bleed}
 \end{table}
 
-That live gain needs splitting, because it has two possible causes: bleed on the close mic,
-or a recording-domain mismatch the separator smooths over. Binning close-mic accuracy by how
-far a window sits above its bleed floor separates them. Vocal and violin rise monotonically
-(72.7$\rightarrow$92.8\,\% and 40.1$\rightarrow$83.6\,\% from 10--15\,dB to $\geq$30\,dB
-above floor), reaching roughly where the separated stems already sit, so for those two the
-gap \emph{is} bleed and separation removes it. Mridangam instead flattens at about 48\,\%
-and its dominant error becomes \emph{tabla}: Saraga's live mridangam sounds partly like
-tabla to this classifier even when nearly bleed-free, so its $+47$-point gain is mostly
-domain adaptation and we do not claim it as bleed removal. Separating the released stereo
-master works for voice (95.3\,\%) and mridangam (86.9\,\%) but not violin (54.7\,\%, back to
-close-mic level), which is the more honest number for the realistic case of separating a
-published recording.
+That live gain needs splitting, because it has two possible causes: bleed on the close mic, or a
+recording-domain mismatch the separator smooths over. Binning close-mic accuracy by how far a
+window sits above its bleed floor separates them. Vocal and violin rise monotonically
+(72.7$\rightarrow$92.8\,\% and 40.1$\rightarrow$83.6\,\%), reaching roughly where the separated
+stems already sit, so for those two the gap \emph{is} bleed and separation removes it. Mridangam
+instead flattens at about 48\,\% and its dominant error becomes \emph{tabla}: Saraga's live
+mridangam sounds partly like tabla to this classifier even when nearly bleed-free, so its
+$+47$-point gain is mostly domain adaptation and we do not claim it as bleed removal. Separating
+the released master works for voice (95.3\,\%) and mridangam (86.9\,\%) but not violin (54.7\,\%,
+back to close-mic level), the more honest number for separating a published recording.
 
 \section{Discussion and limitations}
-The two headline numbers disagree informatively. On live audio the separator's SDR is
-mediocre (3.44\,dB) while its classifier score is excellent (86.3 vs 60.0\,\%), and per
-track the two are essentially uncorrelated ($r$ = $+0.02$ to $+0.10$). This is not noise:
-every Saraga reference contains room bleed, so a separator that removes bleed \emph{cannot}
-match the reference and is scored down for succeeding. SDR on live multitracks therefore
-cannot distinguish failure from clean separation, and the downstream-classifier metric is the
-one to trust there. That is the main methodological finding of the project.
+The two headline numbers disagree informatively. On live audio the separator's SDR is mediocre
+(3.44\,dB) while its classifier score is excellent, and per track the two are essentially
+uncorrelated ($r$ = $+0.02$ to $+0.10$). That is not noise: every Saraga reference contains room
+bleed, so a separator that removes bleed \emph{cannot} match the reference and is scored down for
+succeeding. SDR on live multitracks therefore cannot distinguish failure from clean separation,
+and the classifier metric is the one to trust there. This is the project's main methodological
+finding.
 
-The failures are equally clear. \textbf{Ghatam} fails on live audio ($-8.47$\,dB), has the
-least training data, sits furthest from the oracle mask, and cannot even be tested by the
-bleed metric because the window rule cannot isolate it. \textbf{Violin} is weak and
-anti-correlated with vocal per track ($r=-0.54$): Carnatic violin shadows the voice in the
-same raga and often the same octave, and the shared melodic energy appears to go to one stem
-or the other --- a reading of the correlations we have not verified directly. \textbf{Tonic
-estimation} is right only a third of the time, and its histogram-dominance explanation is
-likewise unverified. \textbf{The off-the-shelf vocoder} is, at this stage, a negative result.
+The failures are equally clear. \textbf{Ghatam} fails on live audio, has the least training data,
+sits furthest from the oracle mask, and cannot even be tested by the bleed metric. \textbf{Violin}
+is weak and anti-correlated with vocal per track ($r=-0.54$): Carnatic violin shadows the voice in
+the same raga and often the same octave, so the shared melodic energy appears to go to one stem or
+the other --- a reading we have not verified directly. \textbf{Tonic estimation} is right only a
+third of the time, and the off-the-shelf \textbf{vocoder} is a negative result.
 
-Other limits are about data rather than modelling. Every Saraga multitrack was recorded at
-one venue, so nothing here tests a different room; concert identity explains only 15\,\% of
-per-track variance, suggesting the piece matters more than the recording, but that cannot be
-generalised beyond this venue. Holding out Concert03 cost nothing on live audio and a
-checkpoint trained on all 37 tracks scores the same, so the binding constraint is Sanidha's
-diversity (5 concerts, very little ghatam) rather than model capacity. We have no ablation
-without the bleed augmentation, so we cannot prove it is what transfers, only that the model
-trained with it does transfer. Concert03 is not perfectly untouched either: the separator
-never trained on it, but the epoch was \emph{selected} by its validation SDR, which slightly
-flatters the separated column; the classifier never saw it. Finally, vocal, mridangam and
-ghatam come only from Sanidha, so the classifier could partly be recognising ``a Sanidha
-recording''; the per-class budget, level augmentation and the fact that mixture windows go to
-guitar and veena rather than those three classes bound this without eliminating it. No
-listening test has been run, which is the only fair way to judge Griffin--Lim and the
-vocoder. Next, in order of expected value: a bleed-augmentation ablation; more ghatam and
-more venues; fine-tuning the vocoder on masked Sanidha estimates; a trained tonic model; a
-delay-and-polarity correction plus a phase-blind metric so released masters can be scored
-fairly; and a formal listening test.
+Other limits are about data. Every Saraga multitrack comes from one venue, so nothing tests a
+different room. A checkpoint trained on all 37 tracks scores the same on Saraga, so the binding
+constraint is Sanidha's diversity (5 concerts, little ghatam) rather than model capacity. We have
+no ablation without the bleed augmentation, so we cannot prove it is what transfers. Concert03 is
+not perfectly untouched: the separator never trained on it, but its epoch was \emph{selected} by
+validation SDR on it, which slightly flatters the separated column. Vocal, mridangam and ghatam
+come only from Sanidha, so the classifier could partly be recognising ``a Sanidha recording''. No
+listening test has been run, the only fair way to judge Griffin--Lim and the vocoder. Next, by
+expected value: a bleed-augmentation ablation; more ghatam and more venues; fine-tuning the
+vocoder on masked estimates; and a delay-and-polarity correction so released masters can be scored
+fairly.
 
 \section{Conclusion}
-Re-heading and fine-tuning a Western demixing model on 37 studio Carnatic multitracks, with
-bleed simulated during training, produces a separator that transfers to live concert
-recordings it never saw and beats a signal-processing baseline by 7--9\,dB. More useful than
-the SDR is the finding that SDR is the wrong metric here: because live references are
-themselves bled, bleed removal had to be measured with a downstream timbre classifier, which
-puts separated live stems at 86.3\,\% against 60.0\,\% for the close microphones they came
-from. The remaining failures concentrate in the quietest stem (ghatam) and in the instrument
-that shares a melodic line with the voice (violin), both pointing at corpus diversity rather
+Re-heading and fine-tuning a Western demixing model on 37 studio Carnatic multitracks, with bleed
+simulated during training, gives a separator that transfers to live concerts it never saw and beats
+a signal-processing baseline by 7--9\,dB. More useful than the SDR is the finding that SDR is the
+wrong metric here: because live references are themselves bled, bleed removal had to be measured
+with a downstream timbre classifier, which puts separated live stems at 86.3\,\% against 60.0\,\%
+for the close microphones they came from. The remaining failures concentrate in the quietest stem
+and in the instrument sharing a melodic line with the voice, pointing at corpus diversity rather
 than model capacity.
 
 \section*{Individual member contributions}
@@ -399,9 +345,9 @@ than model capacity.
 \toprule
 Name & Contribution \\
 \midrule
-Member One & Problem formulation; STFT/HPSS front end and tonic estimation (Milestone 1); kernel sweep and baseline; Sections 1 and 3.1. \\
-Member Two & HTDemucs re-heading, bleed augmentation and fine-tuning (Milestone 2); resynthesis comparison and vocoder wrapper (Milestone 3); Sections 3.2--3.3 and 5. \\
-Member Three & Dataset loaders and de-duplication; MFCC CNN classifier, bleed-floor window rule and its validation (Milestone 4); Sections 4, 6 and 7. \\
+Member One & STFT/HPSS front end, tonic estimation, kernel sweep and baseline; Sections 1, 3.1. \\
+Member Two & HTDemucs re-heading, bleed augmentation, fine-tuning; resynthesis and vocoder; Sections 3.2--3.3, 5. \\
+Member Three & Dataset loaders and de-duplication; MFCC CNN, bleed-floor rule and validation; Sections 4, 6, 7. \\
 \bottomrule
 \end{tabularx}}
 
@@ -409,15 +355,13 @@ Member Three & Dataset loaders and de-duplication; MFCC CNN classifier, bleed-fl
 \noindent All members have read this report and agree with the statement above.
 
 \section*{Generative AI disclosure}
-Claude (Anthropic, Opus-class models, accessed through Claude Code, 2025--26) was used as a
-coding and writing assistant: drafting and debugging Python across the pipeline, scripts and
-unit tests, drafting the deliverable READMEs, and drafting and editing the prose and tables
-of this report, which were populated from the project's own result JSON files. It was not
-used to generate data, audio or results; every number here comes from a run of our own code
-on the corpora named in Section~4. We have checked all such output and take full
-responsibility for it. No generative model forms part of the method itself; the pretrained
-networks used as components (HTDemucs, BigVGAN v2) are described in Section~3 rather than
-here.
+Claude (Anthropic, Opus-class models, via Claude Code, 2025--26) was used as a coding and writing
+assistant: drafting and debugging Python across the pipeline, scripts and unit tests, and drafting
+and editing this report's prose and tables, which were populated from the project's own result
+JSON files. It was not used to generate data, audio or results; every number here comes from a run
+of our own code on the corpora in Section~4. We have checked all such output and take full
+responsibility for it. No generative model forms part of the method; the pretrained components
+(HTDemucs, BigVGAN v2) are described in Section~3.
 
 \section*{Code availability}
 \noindent Code and data:\\
@@ -429,53 +373,40 @@ results reported here.
 \small
 \bibitem{russell2021aima}
 S.~Russell and P.~Norvig.
-\newblock \emph{Artificial Intelligence: A Modern Approach}, 4th edition.
-\newblock Pearson, 2021.
+\newblock \emph{Artificial Intelligence: A Modern Approach}, 4th ed. Pearson, 2021.
 
 \bibitem{sanidha2025}
-V.~Ramakrishnan et al.
-\newblock Sanidha: a studio-quality multi-modal dataset of Carnatic music.
-\newblock \emph{arXiv:2501.06959}, 2025.
+Sanidha: a studio-quality multi-modal dataset of Carnatic music. \emph{arXiv:2501.06959}, 2025.
 
 \bibitem{fitzgerald2010hpss}
-D.~FitzGerald.
-\newblock Harmonic/percussive separation using median filtering.
-\newblock In \emph{Proc.\ DAFx}, 2010.
+D.~FitzGerald. Harmonic/percussive separation using median filtering. In \emph{Proc.\ DAFx}, 2010.
 
 \bibitem{rouard2023htdemucs}
-S.~Rouard, F.~Massa and A.~D\'efossez.
-\newblock Hybrid transformers for music source separation.
-\newblock In \emph{Proc.\ ICASSP}, 2023.
+S.~Rouard, F.~Massa and A.~D\'efossez. Hybrid transformers for music source separation. In
+\emph{Proc.\ ICASSP}, 2023.
 
 \bibitem{hennequin2020spleeter}
-R.~Hennequin, A.~Khlif, F.~Voituret and M.~Moussallam.
-\newblock Spleeter: a fast and efficient music source separation tool.
-\newblock \emph{Journal of Open Source Software}, 5(50):2154, 2020.
+R.~Hennequin et al. Spleeter: a fast and efficient music source separation tool. \emph{JOSS},
+5(50):2154, 2020.
 
 \bibitem{vincent2006bss}
-E.~Vincent, R.~Gribonval and C.~F\'evotte.
-\newblock Performance measurement in blind audio source separation.
-\newblock \emph{IEEE Trans.\ Audio, Speech and Language Processing}, 14(4):1462--1469, 2006.
+E.~Vincent, R.~Gribonval and C.~F\'evotte. Performance measurement in blind audio source
+separation. \emph{IEEE TASLP}, 14(4):1462--1469, 2006.
 
 \bibitem{leroux2019sisdr}
-J.~Le~Roux, S.~Wisdom, H.~Erdogan and J.~R.~Hershey.
-\newblock SDR --- half-baked or well done?
-\newblock In \emph{Proc.\ ICASSP}, 2019.
+J.~Le~Roux et al. SDR --- half-baked or well done? In \emph{Proc.\ ICASSP}, 2019.
 
 \bibitem{griffin1984}
-D.~Griffin and J.~Lim.
-\newblock Signal estimation from modified short-time Fourier transform.
-\newblock \emph{IEEE Trans.\ Acoustics, Speech and Signal Processing}, 32(2):236--243, 1984.
+D.~Griffin and J.~Lim. Signal estimation from modified short-time Fourier transform. \emph{IEEE
+TASSP}, 32(2):236--243, 1984.
 
 \bibitem{lee2023bigvgan}
-S.~Lee, W.~Ping, B.~Ginsburg, B.~Catanzaro and S.~Yoon.
-\newblock BigVGAN: a universal neural vocoder with large-scale training.
-\newblock In \emph{Proc.\ ICLR}, 2023.
+S.~Lee et al. BigVGAN: a universal neural vocoder with large-scale training. In \emph{Proc.\
+ICLR}, 2023.
 
 \bibitem{srinivasamurthy2021saraga}
-A.~Srinivasamurthy, S.~Gulati, R.~Caro Repetto and X.~Serra.
-\newblock Saraga: open datasets for research on Indian art music.
-\newblock \emph{Empirical Musicology Review}, 2021.
+A.~Srinivasamurthy, S.~Gulati, R.~Caro Repetto and X.~Serra. Saraga: open datasets for research on
+Indian art music. \emph{Empirical Musicology Review}, 2021.
 \end{thebibliography}
 
 \end{document}
